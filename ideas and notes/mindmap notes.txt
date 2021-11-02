@@ -1,0 +1,32 @@
+SERVER
+database:
+	- data sent from car	
+	- canIDs with plain text names
+	- save data:
+		- canID, data timestamp, session nr
+
+get requests from client:
+	- GET /
+	- GET /live
+	- GET /history
+	- POST /insert
+
+
+CLIENT
+homepage:
+	-menubar
+
+livedata:
+	- menubar
+	- select what data to show
+	- linechart
+
+data from database:
+	- menubar
+	- select what data to show
+	- linechart
+	- plot chart with custom x and y axis values
+	- delete data
+
+insert new canIDs
+ 	- send new canIDs and plain text names to server that saves them to database
