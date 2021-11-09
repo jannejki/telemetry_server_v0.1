@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Mohave:wght@700&display=swap');
+
+/*---------------------------------------*/
+/*--------------NAV BAR------------------*/
+#navbar {
+    font-size:30px;
+    font-family: 'Mohave', sans-serif;
+    width:250px;
+    height:100%;
+    position:fixed;
+    left:0;
+    top:0;
+    margin:auto;
+    background:#46494C;
+}
+
+#navList {
+    list-style-type: none;
+    padding:0;
+    margin-top:0;
+}
+
+li {
+    text-align:center;
+    margin-bottom:2px;
+    padding:1.5em;
+    background-color:#4C5C68;
+}
+
+li:hover:not(.active) {
+    background-color:#657a8a;
+}
+
+a {
+    color:white;
+    text-decoration: none;
+}
+
+.active {
+    background-color:#DCDCDD;
+    color:#657a8a;
+}

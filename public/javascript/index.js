@@ -1,5 +1,5 @@
-startTime();
-
+//startTime();
+console.log("testi");
 function startTime() {
     const today = new Date();
     let h = today.getHours();
