@@ -1,3 +1,28 @@
 html {
     background-color:#585b5d;
 }
+
+#newCanForm {
+    width:33%;
+    display:flex;
+    flex-wrap:wrap;
+    margin: auto;
+    padding:1em;
+    background-color: white;
+    font-weight: bold;
+    justify-content:center;
+    border-radius:5px;
+}
+
+.textInput {
+    padding:0;
+    font-size: 24px;
+    margin-top:1ch;
+    margin-bottom:1ch;
+    width:100%;
+}
+
+.row {
+    width:100%;
+    padding:1ch;
+}

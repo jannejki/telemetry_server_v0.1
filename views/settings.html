@@ -10,13 +10,35 @@
 
 <div id="navbar">
     <ul id="navList">
-        <a href="/"><li class="">Home</li></a>
-        <a href="live"><li class="">Live</li></a>
-        <a href="history"><li class="">History</li></a>
-        <a href="settings"> <li class="active">Settings</li></a>
+        <a href="/">
+            <li class="">Home</li>
+        </a>
+        <a href="live">
+            <li class="">Live</li>
+        </a>
+        <a href="history">
+            <li class="">History</li>
+        </a>
+        <a href="settings">
+            <li class="active">Settings</li>
+        </a>
     </ul>
 </div>
 
-<script src="javascript/index.js"></script>
+<main>
+    <form action="/newCAN" method="POST" id="newCanForm">
+        <div class="row">
+            <label for="canID">New canID:</label><br>
+            <input type="text" name="canID" id="canID" class="textInput">
+        </div>
+        <div class="row">
+            <label for="canName">canID name:</label>
+            <input type="text" name="canName" id="canName" class="textInput">
+        </div>
+        <input type="submit">
+    </form>
+</main>
+
+<script src="javascript/settings.js"></script>
 </body>
 </html>

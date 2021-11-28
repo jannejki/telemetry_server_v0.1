@@ -2,6 +2,11 @@
 
 /*---------------------------------------*/
 /*--------------NAV BAR------------------*/
+
+main {
+    margin-left:250px;
+}
+
 #navbar {
     font-size:30px;
     font-family: 'Mohave', sans-serif;

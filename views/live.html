@@ -10,13 +10,34 @@
 
 <div id="navbar">
     <ul id="navList">
-        <a href="/"><li class="">Home</li></a>
-        <a href="live"><li class="active">Live</li></a>
-        <a href="history"><li class="">History</li></a>
-        <a href="settings"> <li class="">Settings</li></a>
+        <a href="/">
+            <li class="">Home</li>
+        </a>
+        <a href="live">
+            <li class="active">Live</li>
+        </a>
+        <a href="history">
+            <li class="">History</li>
+        </a>
+        <a href="settings">
+            <li class="">Settings</li>
+        </a>
     </ul>
 </div>
 
-<script src="javascript/index.js"></script>
+<main>
+    <div id="addNewChart">
+        <select name="can" id="canDropDown">
+            <option value="can1">can1</option>
+            <option value="can2">can2</option>
+            <option value="can3">can3</option>
+            <option value="can4">can4</option>
+            <input type="button" id="selectCANBtn" value="select CAN" onclick="addChart()">
+            <button onclick="update()">update</button>
+        </select>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="javascript/live.js"></script>
 </body>
 </html>
