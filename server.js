@@ -58,10 +58,27 @@ app.post("/newCAN", async (req, res) => {
     res.sendStatus(204);
 })
 
+let lowerLimit = true;
+let upperLimit = false;
+latestMessage  = 0;
+let canID = 1;
+
 app.get("/updateLive", (req, res) => {
-    latestMessage = Math.floor(Math.random() * 30) + 10;
-    console.log(latestMessage);
-    res.send({data: latestMessage}).status(204);
+    if (lowerLimit && !upperLimit) {
+        latestMessage++;
+        if (latestMessage === 40) {
+            upperLimit = true;
+            lowerLimit = false;
+        }
+    } else if (!lowerLimit && upperLimit) {
+        latestMessage--;
+        if (latestMessage === 0) {
+            lowerLimit = true;
+            upperLimit = false;
+        }
+    }
+    canID = Math.floor(Math.random() * 4) + 1;
+    res.send({data: latestMessage, canID: "can"+canID}).status(204);
 })
 
 
