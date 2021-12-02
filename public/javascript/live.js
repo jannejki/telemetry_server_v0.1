@@ -1,50 +1,53 @@
+/**
+ * @desc global variable for interval function that sends request for server.
+ * @type {number}
+ */
+let getLatestMessage;       //time interval function
+
+/**
+ * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
+ * @type {number}
+ */
+let interval = 200;         // updating charts time in milliseconds
+/**
+ * @desc global variable where latest received message is saved.
+ * @type {JSON}
+ */
 let latestMessage;
-let lastMessage = "";
-let getLatestMessage;
-let fetchData;
-let interval = 50;         // updating charts time in milliseconds
+
+/**
+ * @desc global variable where the last updated message in the charts is saved
+ * @type {JSON}
+ */
+let lastMessage;
+
+/**
+ * @desc global variable that contains values for the ".timeDropDown" -element options. every element represents seconds.
+ * @type {number[]}
+ */
+
 let xAxisOptionArray = [10, 30, 60, 90, 120, 180];
 
 
+/**
+ * @desc Creates new chart div to "main" and creates new Chart -object to it.
+ * @desc Uses createChartElements() and createOptionElements() to create elements.
+ */
 function addChart() {
     let selectedCAN = document.getElementById("canDropDown").value;
     let chart;
-    let label = 1;
-    
-    let data = {
-        labels: [],
-        datasets: [{
-            spanGaps: true,
-            label: selectedCAN,
-            backgroundColor: "rgba(255,99,132,0.2)",
-            borderColor: "rgba(255,99,132,1)",
-            borderWidth: 2,
-            hoverBackgroundColor: "rgba(255,99,132,0.4)",
-            hoverBorderColor: "rgba(255,99,132,1)",
-            data: []
-        }]
-    };
-    var options = {
-        animation: false,
-        scales: {
-            y: {
-                min: 0,
-                max: 45,
-                stacked: true,
-                grid: {
-                    display: true,
-                    color: "rgba(255,99,132,0.2)"
-                }
-            },
-            x: {
-                grid: {
-                    display: false
-                }
-            }
-        }
-    };
+    let ticks = 1;
+
+    // Creating new object for chart settings and settings charts label for corresponding CAN name
+    let chartSettings = new ChartSettings();
+    let chartData = chartSettings.data;
+    let chartOptions = chartSettings.options;
+
+    chartData.datasets[0].label = selectedCAN;
 
     createChartElements(selectedCAN);
+
+    // Selecting HTML elements that has user input
     let timeSelectElements = document.getElementsByClassName("selectTime " + selectedCAN);
     let selectTimeButton = document.getElementsByClassName("selectTimeButton " + selectedCAN)[0];
 
@@ -57,32 +60,47 @@ function addChart() {
             timeSelectElements[0].remove();
 
             createOptionElements(selectedCAN);
-            clearInterval(getLatestMessage);
 
-            let optionsDiv = document.getElementsByClassName("optionsDiv " + selectedCAN);
-            let highestValue = optionsDiv[1];
-            let currentValue = optionsDiv[2];
-            let lowestValue = optionsDiv[3];
-
-            getLatestMessage = setInterval((fetchMessage), interval);
-
-            let canvas = document.getElementsByClassName("canvas " + selectedCAN)[0];
-            console.log(canvas);
-            chart = new Chart(canvas, {
-                type: 'line',
-                options: options,
-                data: data
-            });
-
-            for (let i = 0; i < selectedTime; i++) {
-                chart.data.labels.push(i + 1);
+            // Creating interval that will requests new messages from server
+            if (getLatestMessage === undefined) {
+                getLatestMessage = setInterval((fetchMessage), interval);
+                console.log("getLatesMessage started");
             }
 
-        setInterval(() => {
-            updateChart(selectedCAN, chart, label, selectedTime, latestMessage, lowestValue, highestValue, currentValue);
-            lastMessage = latestMessage;
-            label++;
-        }, interval);
+            // selecting HTML element where the chart will be displayed
+            let canvas = document.getElementsByClassName("canvas " + selectedCAN)[0];
+
+            // Creating chart object
+            chart = new Chart(canvas, {
+                type: 'line',
+                options: chartOptions,
+                data: chartData
+            });
+
+
+            // Calculating X-axis labels and pushing them to chart
+            let labelAmount = (selectedTime * 1000) / interval;
+            let oneSec = labelAmount / selectedTime;
+
+            for (let i = 0; i < labelAmount; i++) {
+                let seconds = i / oneSec;
+                if ((seconds % 1) === 0) {
+                    chart.data.labels.push(seconds);
+                } else {
+                    chart.data.labels.push("");
+                }
+            }
+
+            // Starting an interval that will update the chart with new data.
+            let chartUpdateInterval = setInterval(() => {
+                try {
+                    updateChart(selectedCAN, chart, ticks, labelAmount, oneSec);
+                } catch (error) {
+                    clearInterval(chartUpdateInterval);
+                }
+                lastMessage = latestMessage;
+                ticks++;
+            }, interval);
         }
     )
 }
@@ -90,48 +108,58 @@ function addChart() {
 
 /**
  * @brief function updates chart data.
- * @param selectedCAN
- * @param chart
- * @param label
- * @param startTime
- * @param data
- * @param lowest
- * @param highest
- * @param current
+ * @param selectedCAN {text} name of the CAN that is selected
+ * @param chart {object} Chart that will be updated
+ * @param ticks {int}   number that gets incremented by 1 every time chart is updated
+ * @param startTime {int} amount of labels that are already in charts X-axis
+ * @param oneSec {number} amount of ticks that correspond one second in X-axis
  */
 
-function updateChart(selectedCAN, chart, label, startTime, data, lowest, highest, current) {
-    if (label > startTime) {
-        chart.data.labels.push(label);
+function updateChart(selectedCAN, chart, ticks, startTime, oneSec) {
+    let optionsDiv = document.getElementsByClassName("optionsDiv " + selectedCAN);
+    let highestValue = optionsDiv[1];
+    let currentValue = optionsDiv[2];
+    let lowestValue = optionsDiv[3];
+    let label = ticks / oneSec;
+
+    if (ticks >= startTime) {
+        if ((label % 1 === 0)) {
+            chart.data.labels.push(label);
+        } else {
+            chart.data.labels.push("");
+        }
         chart.data.labels.shift();
     }
 
     chart.data.datasets.forEach((dataset) => {
-        if (selectedCAN === data.canID) {
-            dataset.data.push(data.data);
-            if (label > startTime) {
+        if (selectedCAN === latestMessage.canID) {
+            dataset.data.push(latestMessage.data);
+            if (ticks > startTime) {
                 dataset.data.shift();
             }
         } else {
             dataset.data.push(null);
-            if (label > startTime) {
+            if (ticks > startTime) {
                 dataset.data.shift();
             }
         }
 
     });
-    if (selectedCAN === data.canID) {
-        if (data.data > highest.innerHTML) {
-            highest.innerHTML = data.data;
+    if (selectedCAN === latestMessage.canID) {
+        if (latestMessage.data > highestValue.innerHTML) {
+            highestValue.innerHTML = latestMessage.data;
         }
-        if (data.data < lowest.innerHTML) {
-            lowest.innerHTML = data.data;
+        if (latestMessage.data < lowestValue.innerHTML) {
+            lowestValue.innerHTML = latestMessage.data;
         }
-        current.innerHTML = data.data;
+        currentValue.innerHTML = latestMessage.data;
     }
     chart.update();
 }
 
+/**
+ * @brief Sends a request to server to get latest message from the car
+ */
 function fetchMessage() {
     {
         fetch('/updateLive')
@@ -145,7 +173,7 @@ function fetchMessage() {
 
 /**
  * @brief Creating elements for optionsDiv
- * @param selectedCAN
+ * @param selectedCAN {string}
  */
 function createOptionElements(selectedCAN) {
     let canDivs = document.getElementsByClassName(selectedCAN);
@@ -169,7 +197,7 @@ function createOptionElements(selectedCAN) {
     removeButtonDiv.appendChild(removeElementBtn);
     optionsDiv.appendChild(removeButtonDiv);
 
-    // // creating div and elements for lowest value
+    // // creating div and elements for current value
     const currentDiv = document.createElement("div");
     currentDiv.setAttribute("class", "infoDiv " + selectedCAN);
 
@@ -180,6 +208,7 @@ function createOptionElements(selectedCAN) {
     let currentValue = document.createElement("p");
     currentValue.setAttribute("id", "currentValue");
     currentValue.setAttribute("class", "optionsDiv " + selectedCAN);
+
 
     // creating div and elements for highest value
     const highestDiv = document.createElement("div");
@@ -192,6 +221,7 @@ function createOptionElements(selectedCAN) {
     const highestLabel = document.createElement("label");
     highestLabel.setAttribute("for", "highestValue");
     highestLabel.innerHTML = "Highest: ";
+
 
     // creating div and elements for lowest value
     const lowestDiv = document.createElement("div");
@@ -218,6 +248,10 @@ function createOptionElements(selectedCAN) {
     optionsDiv.appendChild(lowestDiv);
 }
 
+/**
+ * @brief Creating HTML elements for chart
+ * @param selectedCAN {string} name of the selected CAN
+ */
 function createChartElements(selectedCAN) {
     // Creating Div element where all other elements will be created
     const dataDiv = document.createElement("div");
@@ -230,7 +264,7 @@ function createChartElements(selectedCAN) {
 
     // Creating canvas where the chart will appear
     const canvas = document.createElement("canvas");
-    canvas.setAttribute("id", "myCanvas");
+    canvas.setAttribute("id", selectedCAN);
     canvas.setAttribute("class", "canvas " + selectedCAN);
     chartContainer.appendChild(canvas);
 
