@@ -1,10 +1,4 @@
 /**
- * @desc global variable for interval function that sends request for server.
- * @type {number}
- */
-let getLatestMessage;       //time interval function
-
-/**
  * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
  * @type {number}
  */
@@ -30,13 +24,14 @@ let xAxisOptionArray = [10, 30, 60, 90, 120, 180];
 
 
 /**
- * @desc Creates new chart div to "main" and creates new Chart -object to it.
- * @desc Uses createChartElements() and createOptionElements() to create elements.
+ * Creates new chart div to "main" and creates new Chart -object to it.
+ * Uses createChartElements() and createOptionElements() to create elements.
  */
 function addChart() {
     let selectedCAN = document.getElementById("canDropDown").value;
     let chart;
     let ticks = 1;
+    let getLatestMessage;
 
     // Creating new object for chart settings and settings charts label for corresponding CAN name
     let chartSettings = new ChartSettings();
@@ -54,55 +49,57 @@ function addChart() {
     // Creating eventListener for selecting x-axis time.
     selectTimeButton.addEventListener("click", () => {
 
-            //deleting timeDropdown and selectTime elements because they are no longer needed
-            let selectedTime = timeSelectElements[0].value;
-            timeSelectElements[1].remove();
-            timeSelectElements[0].remove();
+        //deleting timeDropdown and selectTime elements because they are no longer needed
+        let selectedTime = timeSelectElements[0].value;
+        timeSelectElements[1].remove();
+        timeSelectElements[0].remove();
 
-            createOptionElements(selectedCAN);
+        createOptionElements(selectedCAN);
 
-            // Creating interval that will requests new messages from server
-            if (getLatestMessage === undefined) {
-                getLatestMessage = setInterval((fetchMessage), interval);
-                console.log("getLatesMessage started");
-            }
-
-            // selecting HTML element where the chart will be displayed
-            let canvas = document.getElementsByClassName("canvas " + selectedCAN)[0];
-
-            // Creating chart object
-            chart = new Chart(canvas, {
-                type: 'line',
-                options: chartOptions,
-                data: chartData
-            });
-
-
-            // Calculating X-axis labels and pushing them to chart
-            let labelAmount = (selectedTime * 1000) / interval;
-            let oneSec = labelAmount / selectedTime;
-
-            for (let i = 0; i < labelAmount; i++) {
-                let seconds = i / oneSec;
-                if ((seconds % 1) === 0) {
-                    chart.data.labels.push(seconds);
-                } else {
-                    chart.data.labels.push("");
-                }
-            }
-
-            // Starting an interval that will update the chart with new data.
-            let chartUpdateInterval = setInterval(() => {
-                try {
-                    updateChart(selectedCAN, chart, ticks, labelAmount, oneSec);
-                } catch (error) {
-                    clearInterval(chartUpdateInterval);
-                }
-                lastMessage = latestMessage;
-                ticks++;
+        // Creating interval that will requests new messages from server
+        if (getLatestMessage === undefined) {
+            getLatestMessage = setInterval(() => {
+                fetchMessage(selectedCAN);
             }, interval);
         }
-    )
+
+
+        // selecting HTML element where the chart will be displayed
+        let canvas = document.getElementsByClassName("canvas " + selectedCAN)[0];
+
+        // Creating chart object
+        chart = new Chart(canvas, {
+            type: 'line',
+            options: chartOptions,
+            data: chartData
+        });
+
+
+        // Calculating X-axis labels and pushing them to chart
+        let labelAmount = (selectedTime * 1000) / interval;
+        let oneSec = labelAmount / selectedTime;
+
+        for (let i = 0; i < labelAmount; i++) {
+            let seconds = i / oneSec;
+            if ((seconds % 1) === 0) {
+                chart.data.labels.push(seconds);
+            } else {
+                chart.data.labels.push("");
+            }
+        }
+
+        // Starting an interval that will update the chart with new data.
+        let chartUpdateInterval = setInterval(() => {
+            try {
+                updateChart(selectedCAN, chart, ticks, labelAmount, oneSec);
+            } catch (error) {
+                clearInterval(chartUpdateInterval);
+            }
+            lastMessage = latestMessage;
+            ticks++;
+        }, interval);
+
+    }
 }
 
 
@@ -160,14 +157,13 @@ function updateChart(selectedCAN, chart, ticks, startTime, oneSec) {
 /**
  * @brief Sends a request to server to get latest message from the car
  */
-function fetchMessage() {
-    {
-        fetch('/updateLive')
-            .then(response => response.json())
-            .then((data) => {
-                latestMessage = data;
-            })
-    }
+function fetchMessage(selectedCAN) {
+    fetch('/updateLive/?can=' + selectedCAN)
+        .then(response => response.json())
+        .then((data) => {
+            latestMessage = data;
+            console.log(latestMessage);
+        })
 }
 
 
@@ -188,11 +184,7 @@ function createOptionElements(selectedCAN) {
     removeElementBtn.setAttribute("type", "button");
     removeElementBtn.setAttribute("value", "delete");
     removeElementBtn.setAttribute("class", "deleteChartButton");
-    removeElementBtn.addEventListener("click", () => {
-        if (confirm("Are you sure you want to remove this chart?")) {
-            chartDiv.remove();
-        }
-    });
+    removeElementBtn.setAttribute("id", "delete" + selectedCAN + "Button");
 
     removeButtonDiv.appendChild(removeElementBtn);
     optionsDiv.appendChild(removeButtonDiv);

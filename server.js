@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
 
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/views/index.html'));
 });
 
-app.get('/live', (req, res) => {
+app.get('/live',async (req, res) => {
     //TODO: send live data
     console.log("live");
     res.sendFile(path.join(__dirname, '/views/live.html'));
@@ -59,13 +59,14 @@ app.post("/newCAN", async (req, res) => {
 })
 
 
-latestMessage  = 0;
+latestMessage = 0;
 let canID = 1;
 
-app.get("/updateLive", (req, res) => {
-    latestMessage = 20 + (Math.floor(Math.random() * 5)+1);
-    canID = Math.floor(Math.random() * 4) + 1;
-    res.send({data: latestMessage, canID: "can1"}).status(204);
+app.get("/updateLive", async (req, res) => {
+    console.log("req.query.can");
+    let latestMessage = await getLatestData(req.query.can);
+    console.log(latestMessage);
+    res.send({ data: latestMessage }).status(204);
 })
 
 
@@ -73,7 +74,8 @@ app.get("/updateLive", (req, res) => {
 //------------------MQTT--------------------------//
 
 // create MQTT OBJECT
-const client = mqtt.connect("mqtt:localhost:1883", {clientId: "telemetry_server"});
+//const client = mqtt.connect("mqtt:localhost:1883", {clientId: "telemetry_server"});
+const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "telemetry_server" });
 
 // connecting to mqtt broker
 client.on("connect", function () {
@@ -86,11 +88,9 @@ client.subscribe("messages");
 // receive MQTT messages
 client.on('message', async function (topic, message, packet) {
     console.log(message.toString());
+    latestMessage = message.toString();
     try {
-        latestMessage = JSON.parse(message);
-        if (save) {
-            saveData(jsonMessage);
-        }
+        saveData(message.toString());
     } catch {
         console.log("message is corrupted!");
     }
@@ -123,19 +123,26 @@ const db = require('knex')({
  */
 async function saveData(data) {
     let timestamp = getTime();
-    try {
-        await db('data').insert({
-            canID: data.canID,
-            data: data.message,
-            timestamp: timestamp,
-            session: data.session
-        }).into("data");
-    } catch (error) {
-        console.log("can't save data: ", error);
+    let dataArray = data.split(":");
+
+    while (dataArray.length > 0) {
+        console.log(dataArray[0], " ", dataArray[1], " ", dataArray[2]);
+        try {
+            await db('data').insert({
+                canID: dataArray[0],
+                data: dataArray[2],
+                DLC: dataArray[1],
+                timestamp: timestamp,
+            }).into("data");
+            dataArray.splice(0, 3);
+        } catch (error) {
+            console.log("can't save data: ", error);
+        }
     }
 }
 
 //TODO: retrieve data
+//TODO: rename function
 function getData() {
     let data = db.select().from("canID");
     return data;
@@ -159,6 +166,12 @@ async function newCAN(canInfo) {
         console.log(error);
         return false;
     }
+}
+
+async function getLatestData(CANID) {
+    return await db('data').where({
+        canID: CANID
+    }).orderBy('ID', 'desc').limit(1).select();
 }
 
 
@@ -187,6 +200,10 @@ function checkTime(i) {
     }
     ;  // add zero in front of numbers < 10
     return i;
+}
+
+function parseMessage(message) {
+    let dataArray = message.split(":");
 }
 
 
