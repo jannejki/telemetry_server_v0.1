@@ -63,10 +63,17 @@ latestMessage = 0;
 let canID = 1;
 
 app.get("/updateLive", async (req, res) => {
-    console.log("req.query.can");
-    let latestMessage = await getLatestData(req.query.can);
-    console.log(latestMessage);
-    res.send({ data: latestMessage }).status(204);
+    let selectedCans = JSON.parse(req.query.can);
+    let latestMessages = [];
+    console.log("\n\nUUSI PYYNTÖ\n\n")
+
+    for(let i in selectedCans) {
+        latestMessages.push(await getLatestData(selectedCans[i].can));
+    }
+
+    console.log(latestMessages);
+    res.send({data: latestMessages}).status(200);
+    //res.send({ data: latestMessage }).status(204);
 })
 
 

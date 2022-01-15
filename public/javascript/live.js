@@ -2,7 +2,7 @@
  * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
  * @type {number}
  */
-let interval = 200;         // updating charts time in milliseconds
+let interval = 500;         // updating charts time in milliseconds
 /**
  * @desc global variable where latest received message is saved.
  * @type {JSON}
@@ -19,9 +19,78 @@ let lastMessage;
  * @desc global variable that contains values for the ".timeDropDown" -element options. every element represents seconds.
  * @type {number[]}
  */
-
 let xAxisOptionArray = [10, 30, 60, 90, 120, 180];
 
+function ServerInterface() {
+    this.idArray = { "canID": [] },
+        this.interval = undefined,
+        this.latestMessage = undefined,
+        this.intervaltime = 2000,
+
+        this.addNewId = function (canID) {
+            this.idArray["canID"].push({ can: canID })
+        }
+
+    this.intervalFunction = () => {
+        var xhttp = new XMLHttpRequest();
+        
+        let testi =  new Promise(resolve => {
+            fetch('/updateLive/?can=' + JSON.stringify(this.idArray["canID"]))
+            .then(response => response.json())
+            .then((data) => {
+                resolve(data);
+            })
+        })
+
+        testi.then(values => {
+            this.latestMessage = values;
+        })
+
+        //console.log("testi", testi.then);
+
+       /*  xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                // Typical action to be performed when the document is ready:
+                try {
+                    //latestMessage = this.response;
+                    this.latestMessage = this.response;
+                } catch(error) {
+                    console.error("error");
+                }
+            }
+        };
+        console.log("latest: ", this.latestMessage);
+
+        xhttp.open("GET", '/updateLive/?can=' + JSON.stringify(this.idArray["canID"]), true);
+        xhttp.send();*/
+    }
+
+    this.deleteCan = (canID) => {
+        for (let i = 0; i < this.idArray["canID"].length; i++) {
+            if (this.idArray["canID"][i].can === canID) {
+                this.idArray["canID"].splice(i, 1);
+            }
+        }
+
+        if (this.idArray["canID"].length === 0) {
+            clearInterval(this.interval);
+        }
+    }
+
+    this.getLatestMessages = (canID) => {
+        for(let i = 0; i < this.latestMessage.data.length; i++) {
+           // console.log(this.latestMessage.data[i][0].canID);
+            if(this.latestMessage.data[i][0].canID === canID) return this.latestMessage.data[i][0];
+        }
+        return false;
+    }
+
+    this.getIdArray = function () {
+        return this.idArray;
+    }
+}
+
+const serverInterface = new ServerInterface();
 
 /**
  * Creates new chart div to "main" and creates new Chart -object to it.
@@ -32,6 +101,7 @@ function addChart() {
     let chart;
     let ticks = 1;
     let getLatestMessage;
+    serverInterface.addNewId(selectedCAN);
 
     // Creating new object for chart settings and settings charts label for corresponding CAN name
     let chartSettings = new ChartSettings();
@@ -57,10 +127,9 @@ function addChart() {
         createOptionElements(selectedCAN);
 
         // Creating interval that will requests new messages from server
-        if (getLatestMessage === undefined) {
-            getLatestMessage = setInterval(() => {
-                fetchMessage(selectedCAN);
-            }, interval);
+        if (serverInterface.interval === undefined) {
+            serverInterface.interval = setInterval(serverInterface.intervalFunction, serverInterface.intervaltime);
+            console.log("uusi interval luotu");
         }
 
 
@@ -90,6 +159,8 @@ function addChart() {
 
         // Starting an interval that will update the chart with new data.
         let chartUpdateInterval = setInterval(() => {
+            let latestMessage = serverInterface.getLatestMessages(selectedCAN);
+            console.log(latestMessage);
             try {
                 updateChart(selectedCAN, chart, ticks, labelAmount, oneSec);
             } catch (error) {
@@ -99,7 +170,7 @@ function addChart() {
             ticks++;
         }, interval);
 
-    }
+    });
 }
 
 
@@ -155,19 +226,6 @@ function updateChart(selectedCAN, chart, ticks, startTime, oneSec) {
 }
 
 /**
- * @brief Sends a request to server to get latest message from the car
- */
-function fetchMessage(selectedCAN) {
-    fetch('/updateLive/?can=' + selectedCAN)
-        .then(response => response.json())
-        .then((data) => {
-            latestMessage = data;
-            console.log(latestMessage);
-        })
-}
-
-
-/**
  * @brief Creating elements for optionsDiv
  * @param selectedCAN {string}
  */
@@ -185,6 +243,10 @@ function createOptionElements(selectedCAN) {
     removeElementBtn.setAttribute("value", "delete");
     removeElementBtn.setAttribute("class", "deleteChartButton");
     removeElementBtn.setAttribute("id", "delete" + selectedCAN + "Button");
+    removeElementBtn.addEventListener("click", () => {
+        document.getElementById(selectedCAN).remove();
+        serverInterface.deleteCan(selectedCAN);
+    });
 
     removeButtonDiv.appendChild(removeElementBtn);
     optionsDiv.appendChild(removeButtonDiv);
