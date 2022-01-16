@@ -1,44 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Telemetry</title>
     <link href="/CSS/navBar.css" rel="stylesheet">
     <link href="/CSS/settings.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div id="navbar">
-    <ul id="navList">
-        <a href="/">
-            <li class="">Home</li>
-        </a>
-        <a href="live">
-            <li class="">Live</li>
-        </a>
-        <a href="history">
-            <li class="">History</li>
-        </a>
-        <a href="settings">
-            <li class="active">Settings</li>
-        </a>
-    </ul>
-</div>
+    <div id="navbar">
+        <ul id="navList">
+            <a href="/">
+                <li class="">Home</li>
+            </a>
+            <a href="live">
+                <li class="">Live</li>
+            </a>
+            <a href="history">
+                <li class="">History</li>
+            </a>
+            <a href="settings">
+                <li class="active">Settings</li>
+            </a>
+        </ul>
+    </div>
 
-<main>
-    <form action="/newCAN" method="POST" id="newCanForm">
-        <div class="row">
-            <label for="canID">New canID:</label><br>
-            <input type="text" name="canID" id="canID" class="textInput">
-        </div>
-        <div class="row">
-            <label for="canName">canID name:</label>
-            <input type="text" name="canName" id="canName" class="textInput">
-        </div>
-        <input type="submit">
-    </form>
-</main>
+    <main>
+        <form action="/newCAN" method="POST" id="newCanForm">
+            <div class="row">
+                <label for="canID">New canID:</label><br>
+                <input type="text" name="CANID" id="canID" class="textInput">
+            </div>
+            <div class="row">
+                <label for="canName">canID name:</label>
+                <input type="text" name="Name" id="canName" class="textInput">
+            </div>
+            <input type="submit">
+        </form>
+        <table id="canTable">
+            <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>DELETE</th>
+            </tr>
+        </table>
+    </main>
 
-<script src="javascript/settings.js"></script>
+    <script src="javascript/settings.js"></script>
 </body>
+
 </html>

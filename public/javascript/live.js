@@ -2,7 +2,7 @@
  * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
  * @type {number}
  */
-let interval = 500;         // updating charts time in milliseconds
+let interval = 100;         // updating charts time in milliseconds
 /**
  * @desc global variable where latest received message is saved.
  * @type {JSON}
@@ -21,48 +21,29 @@ let lastMessage;
  */
 let xAxisOptionArray = [10, 30, 60, 90, 120, 180];
 
+
 function ServerInterface() {
     this.idArray = { "canID": [] },
         this.interval = undefined,
         this.latestMessage = undefined,
-        this.intervaltime = 2000,
+        this.intervaltime = 100,
 
         this.addNewId = function (canID) {
             this.idArray["canID"].push({ can: canID })
         }
 
     this.intervalFunction = () => {
-        var xhttp = new XMLHttpRequest();
-        
-        let testi =  new Promise(resolve => {
+        let response = new Promise(resolve => {
             fetch('/updateLive/?can=' + JSON.stringify(this.idArray["canID"]))
-            .then(response => response.json())
-            .then((data) => {
-                resolve(data);
-            })
+                .then(response => response.json())
+                .then((data) => {
+                    resolve(data);
+                })
         })
 
-        testi.then(values => {
+        response.then(values => {
             this.latestMessage = values;
         })
-
-        //console.log("testi", testi.then);
-
-       /*  xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                // Typical action to be performed when the document is ready:
-                try {
-                    //latestMessage = this.response;
-                    this.latestMessage = this.response;
-                } catch(error) {
-                    console.error("error");
-                }
-            }
-        };
-        console.log("latest: ", this.latestMessage);
-
-        xhttp.open("GET", '/updateLive/?can=' + JSON.stringify(this.idArray["canID"]), true);
-        xhttp.send();*/
     }
 
     this.deleteCan = (canID) => {
@@ -78,9 +59,8 @@ function ServerInterface() {
     }
 
     this.getLatestMessages = (canID) => {
-        for(let i = 0; i < this.latestMessage.data.length; i++) {
-           // console.log(this.latestMessage.data[i][0].canID);
-            if(this.latestMessage.data[i][0].canID === canID) return this.latestMessage.data[i][0];
+        for (let i = 0; i < this.latestMessage.data.length; i++) {
+            if (this.latestMessage.data[i][0].canID === canID) return this.latestMessage.data[i][0];
         }
         return false;
     }
@@ -92,6 +72,20 @@ function ServerInterface() {
 
 const serverInterface = new ServerInterface();
 
+window.onload = () => {
+    fetch('/loadCans')
+    .then(response => response.json())
+    .then((data) => {
+        for(let i = 0; i < data.canList.length; i++) {
+            let option = document.createElement("option");
+            option.setAttribute("value", data.canList[i].CANID);
+            option.innerText = data.canList[i].Name;
+            document.getElementById("canDropDown").appendChild(option);
+        }
+    })
+}
+
+
 /**
  * Creates new chart div to "main" and creates new Chart -object to it.
  * Uses createChartElements() and createOptionElements() to create elements.
@@ -100,7 +94,6 @@ function addChart() {
     let selectedCAN = document.getElementById("canDropDown").value;
     let chart;
     let ticks = 1;
-    let getLatestMessage;
     serverInterface.addNewId(selectedCAN);
 
     // Creating new object for chart settings and settings charts label for corresponding CAN name
@@ -160,11 +153,11 @@ function addChart() {
         // Starting an interval that will update the chart with new data.
         let chartUpdateInterval = setInterval(() => {
             let latestMessage = serverInterface.getLatestMessages(selectedCAN);
-            console.log(latestMessage);
             try {
-                updateChart(selectedCAN, chart, ticks, labelAmount, oneSec);
+                updateChart(latestMessage, chart, ticks, labelAmount, oneSec);
             } catch (error) {
                 clearInterval(chartUpdateInterval);
+                console.error(error);
             }
             lastMessage = latestMessage;
             ticks++;
@@ -176,18 +169,18 @@ function addChart() {
 
 /**
  * @brief function updates chart data.
- * @param selectedCAN {text} name of the CAN that is selected
+ * @param latestMessage {text} latest message that was received
  * @param chart {object} Chart that will be updated
  * @param ticks {int}   number that gets incremented by 1 every time chart is updated
  * @param startTime {int} amount of labels that are already in charts X-axis
  * @param oneSec {number} amount of ticks that correspond one second in X-axis
  */
 
-function updateChart(selectedCAN, chart, ticks, startTime, oneSec) {
-    let optionsDiv = document.getElementsByClassName("optionsDiv " + selectedCAN);
-    let highestValue = optionsDiv[1];
-    let currentValue = optionsDiv[2];
-    let lowestValue = optionsDiv[3];
+function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
+    let optionsDiv = document.getElementsByClassName("numberValues"  + latestMessage.canID);
+    let highestValue = optionsDiv[0];
+    let currentValue = optionsDiv[1];
+    let lowestValue = optionsDiv[2];
     let label = ticks / oneSec;
 
     if (ticks >= startTime) {
@@ -200,28 +193,20 @@ function updateChart(selectedCAN, chart, ticks, startTime, oneSec) {
     }
 
     chart.data.datasets.forEach((dataset) => {
-        if (selectedCAN === latestMessage.canID) {
-            dataset.data.push(latestMessage.data);
-            if (ticks > startTime) {
-                dataset.data.shift();
-            }
-        } else {
-            dataset.data.push(null);
-            if (ticks > startTime) {
-                dataset.data.shift();
-            }
+        dataset.data.push(latestMessage.data);
+        if (ticks > startTime) {
+            dataset.data.shift();
         }
-
     });
-    if (selectedCAN === latestMessage.canID) {
-        if (latestMessage.data > highestValue.innerHTML) {
-            highestValue.innerHTML = latestMessage.data;
-        }
-        if (latestMessage.data < lowestValue.innerHTML) {
-            lowestValue.innerHTML = latestMessage.data;
-        }
-        currentValue.innerHTML = latestMessage.data;
+
+    if (latestMessage.data > highestValue.innerHTML) {
+        highestValue.innerHTML = latestMessage.data;
     }
+    if (latestMessage.data < lowestValue.innerHTML) {
+        lowestValue.innerHTML = latestMessage.data;
+    }
+    currentValue.innerHTML = latestMessage.data;
+
     chart.update();
 }
 
@@ -257,11 +242,12 @@ function createOptionElements(selectedCAN) {
 
     const currentLabel = document.createElement("label");
     currentLabel.setAttribute("for", "currentValue");
+    currentLabel.setAttribute("class", "numberValuesLabel");
     currentLabel.innerHTML = "Current: ";
 
     let currentValue = document.createElement("p");
     currentValue.setAttribute("id", "currentValue");
-    currentValue.setAttribute("class", "optionsDiv " + selectedCAN);
+    currentValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
 
 
     // creating div and elements for highest value
@@ -270,10 +256,11 @@ function createOptionElements(selectedCAN) {
 
     let highestValue = document.createElement("p");
     highestValue.setAttribute("id", "highestValue");
-    highestValue.setAttribute("class", "optionsDiv " + selectedCAN);
+    highestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
 
     const highestLabel = document.createElement("label");
     highestLabel.setAttribute("for", "highestValue");
+    highestLabel.setAttribute("class", "numberValuesLabel");
     highestLabel.innerHTML = "Highest: ";
 
 
@@ -283,11 +270,12 @@ function createOptionElements(selectedCAN) {
 
     const lowestLabel = document.createElement("label");
     lowestLabel.setAttribute("for", "lowestValue");
+    lowestLabel.setAttribute("class", "numberValuesLabel");
     lowestLabel.innerHTML = "Lowest: ";
 
     let lowestValue = document.createElement("p");
     lowestValue.setAttribute("id", "lowestValue");
-    lowestValue.setAttribute("class", "optionsDiv " + selectedCAN);
+    lowestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
     lowestValue.innerHTML = "99";
 
     highestDiv.appendChild(highestLabel);

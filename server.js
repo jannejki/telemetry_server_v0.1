@@ -13,11 +13,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.raw());
 
 const port = 3000;
+app.listen(port, () => {
+    console.log("listening on port", port);
+});
+
 
 var selectedCAN;
-var latestMessage;
-var save = false;
-
 
 //------------------------------------------------//
 //---------------ROUTES---------------------------//
@@ -28,7 +29,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/views/index.html'));
 });
 
-app.get('/live',async (req, res) => {
+app.get('/live', async (req, res) => {
     //TODO: send live data
     console.log("live");
     res.sendFile(path.join(__dirname, '/views/live.html'));
@@ -53,36 +54,49 @@ app.post("/selectLiveCan", (req, res) => {
 })
 
 app.post("/newCAN", async (req, res) => {
-    let test = await getData();
-    console.log(test);
-    res.sendStatus(204);
+    
+    try {
+        await db("canID").insert(req.body);
+        res.sendStatus(201);
+    } catch(error) {
+        res.sendStatus(500);
+    }
+
 })
-
-
-latestMessage = 0;
-let canID = 1;
 
 app.get("/updateLive", async (req, res) => {
     let selectedCans = JSON.parse(req.query.can);
     let latestMessages = [];
-    console.log("\n\nUUSI PYYNTÖ\n\n")
 
-    for(let i in selectedCans) {
+    for (let i in selectedCans) {
         latestMessages.push(await getLatestData(selectedCans[i].can));
     }
 
-    console.log(latestMessages);
-    res.send({data: latestMessages}).status(200);
-    //res.send({ data: latestMessage }).status(204);
+    res.send({ data: latestMessages }).status(200);
 })
 
+app.get("/loadCans", async (req, res) => {
+    let canList = await db.select().from("canID");
+    console.log(canList);
+    res.send({ canList: canList }).status(204);
+})
+
+app.delete("/deleteCan", async (req, res) => {
+    console.log(req.body);
+    try {
+        await db("canID").where(req.body).del();
+        res.sendStatus(204);
+    } catch (error) {
+        res.sendStatus(500);
+    }
+})
 
 //------------------------------------------------//
 //------------------MQTT--------------------------//
 
 // create MQTT OBJECT
-//const client = mqtt.connect("mqtt:localhost:1883", {clientId: "telemetry_server"});
-const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "telemetry_server" });
+const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
+//const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "telemetry_server" });
 
 // connecting to mqtt broker
 client.on("connect", function () {
@@ -102,10 +116,6 @@ client.on('message', async function (topic, message, packet) {
         console.log("message is corrupted!");
     }
 });
-//TODO: send livedata to client
-
-
-//TODO: translate and save MQTT messages
 
 
 //------------------------------------------------//
@@ -208,12 +218,3 @@ function checkTime(i) {
     ;  // add zero in front of numbers < 10
     return i;
 }
-
-function parseMessage(message) {
-    let dataArray = message.split(":");
-}
-
-
-app.listen(port, () => {
-    console.log("listening on port", port);
-});

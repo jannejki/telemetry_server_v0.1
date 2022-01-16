@@ -1,28 +1,43 @@
 html {
-    background-color:#585b5d;
+    background-color: #585b5d;
 }
 
 #newCanForm {
-    width:33%;
-    display:flex;
-    flex-wrap:wrap;
+    width: 33%;
+    display: flex;
+    flex-wrap: wrap;
     margin: auto;
-    padding:1em;
+    padding: 1em;
     background-color: white;
     font-weight: bold;
-    justify-content:center;
-    border-radius:5px;
+    justify-content: center;
+    border-radius: 5px;
 }
 
 .textInput {
-    padding:0;
+    padding: 0;
     font-size: 24px;
-    margin-top:1ch;
-    margin-bottom:1ch;
-    width:100%;
+    margin-top: 1ch;
+    margin-bottom: 1ch;
+    width: 100%;
 }
 
 .row {
-    width:100%;
-    padding:1ch;
+    width: 100%;
+    padding: 1ch;
+}
+
+#canTable {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1em;
+}
+
+#canTable td,
+th {
+    border: 1px solid #dddddd;
+    background: white;
+    text-align: left;
+    padding: 8px;
+    width: 33%;
 }
