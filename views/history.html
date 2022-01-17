@@ -1,22 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Telemetry</title>
     <link href="/CSS/navBar.css" rel="stylesheet">
     <link href="/CSS/history.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div id="navbar">
-    <ul id="navList">
-        <a href="/"><li class="">Home</li></a>
-        <a href="live"><li class="">Live</li></a>
-        <a href="history"><li class="active">History</li></a>
-        <a href="settings"> <li class="">Settings</li></a>
-    </ul>
-</div>
+    <div id="navbar">
+        <ul id="navList">
+            <form action="/logout?_method=DELETE" id="logoutForm" method="post">
+                <input type="submit" value="Log out" id="logoutButton">
+            </form>
+            <a href="/">
+                <li class="">Home</li>
+            </a>
+            <a href="live">
+                <li class="">Live</li>
+            </a>
+            <a href="history">
+                <li class="active">History</li>
+            </a>
+            <a href="settings">
+                <li class="">Settings</li>
+            </a>
+        </ul>
+    </div>
+    <main>
 
-<script src="javascript/history.js"></script>
+    </main>
+    <script src="javascript/history.js"></script>
 </body>
+
 </html>

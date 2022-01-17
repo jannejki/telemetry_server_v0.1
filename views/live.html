@@ -1,40 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Telemetry</title>
     <link href="/CSS/navBar.css" rel="stylesheet">
     <link href="/CSS/live.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div id="navbar">
-    <ul id="navList">
-        <a href="/">
-            <li class="">Home</li>
-        </a>
-        <a href="live">
-            <li class="active">Live</li>
-        </a>
-        <a href="history">
-            <li class="">History</li>
-        </a>
-        <a href="settings">
-            <li class="">Settings</li>
-        </a>
-    </ul>
-</div>
+    <div id="navbar">
+        <ul id="navList">
+            <form action="/logout?_method=DELETE" id="logoutForm" method="post">
+                <input type="submit" value="Log out" id="logoutButton">
+            </form>
+            <a href="/">
+                <li class="">Home</li>
+            </a>
+            <a href="live">
+                <li class="active">Live</li>
+            </a>
+            <a href="history">
+                <li class="">History</li>
+            </a>
+            <a href="settings">
+                <li class="">Settings</li>
+            </a>
+        </ul>
+    </div>
 
-<main>
-    <div id="addNewChart">
-        <select name="can" id="canDropDown">
+    <main>
+        <div id="addNewChart">
+            <select name="can" id="canDropDown">
             </select>
             <input type="button" id="selectCANBtn" value="Create new chart" onclick="addChart()">
-        </select>
-    </div>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="javascript/chartSettings.js"></script>
-<script src="javascript/live.js"></script>
+            </select>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="javascript/chartSettings.js"></script>
+    <script src="javascript/live.js"></script>
 </body>
+
 </html>

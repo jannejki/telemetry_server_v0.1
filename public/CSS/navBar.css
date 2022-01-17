@@ -2,6 +2,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Mohave:wght@700&family=Rubik&display=swap');
 html {
     font-family: 'Rubik', sans-serif;
+    height: 100%;
+}
+
+main {
+    margin: auto!important;
+    margin-top: 0!important;
+    width: 100%!important;
+    padding: 1em!important;
+}
+
+body {
+    display: flex!important;
+    margin: 0!important;
+    height: 100%!important;
 }
 
 
@@ -10,16 +24,12 @@ html {
 
 /*--------------NAV BAR------------------*/
 
-main {
-    margin-left: 250px;
-}
-
 #navbar {
-    font-size: 30px;
-    font-family: 'Mohave', sans-serif;
-    width: 250px;
+    font-size: 25px;
+    font-family: 'Rubik', sans-serif;
     height: 100%;
-    position: fixed;
+    width: auto;
+    position: static;
     left: 0;
     top: 0;
     margin: auto;
@@ -35,8 +45,9 @@ main {
 li {
     text-align: center;
     margin-bottom: 2px;
-    padding: 1.5em;
+    padding: 1em;
     background-color: #4C5C68;
+    height: 10%;
 }
 
 li:hover:not(.active) {
@@ -51,4 +62,26 @@ a {
 .active {
     background-color: #DCDCDD;
     color: #657a8a;
+}
+
+#logoutButton {
+    width: 100%;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    border: 0;
+    font-family: 'Rubik', sans-serif;
+    font-weight: bolder;
+    font-size: 25px;
+    color: white;
+    background: black;
+}
+
+#logoutForm {
+    width: 100%;
+    display: flex;
+}
+
+#logoutButton:hover {
+    cursor: pointer;
+    background: rgb(34, 34, 34);
 }

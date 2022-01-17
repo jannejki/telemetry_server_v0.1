@@ -22,8 +22,6 @@ function ChartSettings() {
         animation: false,
         scales: {
             y: {
-                min: 0,
-                max: 45,
                 stacked: true,
                 grid: {
                     display: true,
@@ -33,9 +31,10 @@ function ChartSettings() {
             x: {
                 ticks: {
                     autoSkip: false,
+
                 },
                 grid: {
-                    display: true
+                    display: false
                 }
             }
         }

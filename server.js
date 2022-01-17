@@ -1,10 +1,31 @@
 'use strict';
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+}
 
 const path = require('path');
 const express = require('express');
 const app = express();
 const mqtt = require('mqtt');
 const bodyParser = require('body-parser');
+const { application } = require('express');
+
+
+const bcrypt = require('bcrypt')
+const passport = require('passport')
+const flash = require('express-flash')
+const session = require('express-session')
+
+const initializePassport = require('./passport-config')
+
+app.use(flash())
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('view engine', 'ejs');
@@ -17,54 +38,85 @@ app.listen(port, () => {
     console.log("listening on port", port);
 });
 
+//------------------------------------------------//
+//---------------AUTHENTICATION-------------------//
+initializePassport(
+    passport,
+    async name => {
+        let users = await db.select().from("users");
+        return users.find(user => user.username === name)
+    },
+    async id => {
+        let users = await db.select().from("users");
+        users.find(user => user.id === id)
+    }
+)
 
-var selectedCAN;
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+}
+
+app.get("/login", (req, res) => {
+    res.render('login.ejs')
+})
+
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}))
+
+app.post('/logout', (req, res) => {
+    console.log("logout");
+    req.logOut();
+    res.redirect('/');
+})
 
 //------------------------------------------------//
 //---------------ROUTES---------------------------//
-//TODO: authenticate user
-app.get('/', (req, res) => {
+app.get('/', checkAuthenticated, (req, res) => {
     // Send a landing page
     console.log("/");
     res.sendFile(path.join(__dirname, '/views/index.html'));
 });
 
-app.get('/live', async (req, res) => {
+app.get('/live', checkAuthenticated, async(req, res) => {
     //TODO: send live data
     console.log("live");
     res.sendFile(path.join(__dirname, '/views/live.html'));
 })
 
-app.get('/history', (req, res) => {
+app.get('/history', checkAuthenticated, (req, res) => {
     //TODO: send history data
     console.log("history");
     res.sendFile(path.join(__dirname, '/views/history.html'));
 })
 
-app.get('/settings', (req, res) => {
+app.get('/settings', checkAuthenticated, (req, res) => {
     //TODO: save new can ID to database
     console.log("settings");
     res.sendFile(path.join(__dirname, '/views/settings.html'));
 })
 
-app.post("/selectLiveCan", (req, res) => {
+app.post("/selectLiveCan", checkAuthenticated, (req, res) => {
     console.log('Got body:', req.body);
     selectedCAN = req.body.CAN;
     res.sendStatus(204);
 })
 
-app.post("/newCAN", async (req, res) => {
-    
+app.post("/newCAN", checkAuthenticated, async(req, res) => {
     try {
         await db("canID").insert(req.body);
         res.sendStatus(201);
-    } catch(error) {
+    } catch (error) {
         res.sendStatus(500);
     }
-
 })
 
-app.get("/updateLive", async (req, res) => {
+app.get("/updateLive", checkAuthenticated, async(req, res) => {
     let selectedCans = JSON.parse(req.query.can);
     let latestMessages = [];
 
@@ -75,13 +127,13 @@ app.get("/updateLive", async (req, res) => {
     res.send({ data: latestMessages }).status(200);
 })
 
-app.get("/loadCans", async (req, res) => {
+app.get("/loadCans", checkAuthenticated, async(req, res) => {
     let canList = await db.select().from("canID");
     console.log(canList);
     res.send({ canList: canList }).status(204);
 })
 
-app.delete("/deleteCan", async (req, res) => {
+app.delete("/deleteCan", checkAuthenticated, async(req, res) => {
     console.log(req.body);
     try {
         await db("canID").where(req.body).del();
@@ -99,7 +151,7 @@ const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server
 //const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "telemetry_server" });
 
 // connecting to mqtt broker
-client.on("connect", function () {
+client.on("connect", function() {
     console.log("connected to MQTT broker!");
 })
 
@@ -107,7 +159,7 @@ client.on("connect", function () {
 client.subscribe("messages");
 
 // receive MQTT messages
-client.on('message', async function (topic, message, packet) {
+client.on('message', async function(topic, message, packet) {
     console.log(message.toString());
     latestMessage = message.toString();
     try {
@@ -214,7 +266,6 @@ function getTime() {
 function checkTime(i) {
     if (i < 10) {
         i = "0" + i
-    }
-    ;  // add zero in front of numbers < 10
+    }; // add zero in front of numbers < 10
     return i;
 }
