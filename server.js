@@ -38,6 +38,7 @@ app.listen(port, () => {
     console.log("listening on port", port);
 });
 
+let latestMessage;
 //------------------------------------------------//
 //---------------AUTHENTICATION-------------------//
 initializePassport(
@@ -147,8 +148,8 @@ app.delete("/deleteCan", checkAuthenticated, async(req, res) => {
 //------------------MQTT--------------------------//
 
 // create MQTT OBJECT
-const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
-//const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "telemetry_server" });
+//const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
+const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "localhostServer" });
 
 // connecting to mqtt broker
 client.on("connect", function() {
@@ -160,7 +161,6 @@ client.subscribe("messages");
 
 // receive MQTT messages
 client.on('message', async function(topic, message, packet) {
-    console.log(message.toString());
     latestMessage = message.toString();
     try {
         saveData(message.toString());
@@ -195,7 +195,6 @@ async function saveData(data) {
     let dataArray = data.split(":");
 
     while (dataArray.length > 0) {
-        console.log(dataArray[0], " ", dataArray[1], " ", dataArray[2]);
         try {
             await db('data').insert({
                 canID: dataArray[0],

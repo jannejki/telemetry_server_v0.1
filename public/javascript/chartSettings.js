@@ -22,6 +22,8 @@ function ChartSettings() {
         animation: false,
         scales: {
             y: {
+                min: 0,
+                max: 15,
                 stacked: true,
                 grid: {
                     display: true,

@@ -14,8 +14,14 @@ html {
     border-radius: 5px;
 }
 
+#addNewChartOptions {
+    margin-left: auto;
+    margin-right: 0;
+}
+
 #selectCANBtn {
     margin: 1em auto;
+    width: 75%;
 }
 
 #canDropDown {
@@ -48,6 +54,16 @@ html {
     border-color: darkgrey;
     border-radius: inherit;
     padding: 0.5em;
+    text-align: center;
+}
+
+.labelDiv {
+    width: 100%;
+    text-align: center;
+}
+
+.optionLabel {
+    margin: auto;
 }
 
 .timeDropDown {
@@ -56,6 +72,7 @@ html {
 
 .selectTimeButton {
     margin: auto;
+    width: 75%;
 }
 
 .removeButtonDiv {

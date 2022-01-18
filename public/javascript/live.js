@@ -2,7 +2,7 @@
  * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
  * @type {number}
  */
-let interval = 100;         // updating charts time in milliseconds
+let interval = 100; // updating charts time in milliseconds
 /**
  * @desc global variable where latest received message is saved.
  * @type {JSON}
@@ -28,7 +28,7 @@ function ServerInterface() {
         this.latestMessage = undefined,
         this.intervaltime = 100,
 
-        this.addNewId = function (canID) {
+        this.addNewId = function(canID) {
             this.idArray["canID"].push({ can: canID })
         }
 
@@ -55,17 +55,20 @@ function ServerInterface() {
 
         if (this.idArray["canID"].length === 0) {
             clearInterval(this.interval);
+            this.interval = undefined;
         }
     }
 
     this.getLatestMessages = (canID) => {
         for (let i = 0; i < this.latestMessage.data.length; i++) {
-            if (this.latestMessage.data[i][0].canID === canID) return this.latestMessage.data[i][0];
+            if (this.latestMessage.data[i][0].canID === canID) {
+                return this.latestMessage.data[i][0];
+            }
+            return false;
         }
-        return false;
     }
 
-    this.getIdArray = function () {
+    this.getIdArray = function() {
         return this.idArray;
     }
 }
@@ -74,16 +77,17 @@ const serverInterface = new ServerInterface();
 
 window.onload = () => {
     fetch('/loadCans')
-    .then(response => response.json())
-    .then((data) => {
-        for(let i = 0; i < data.canList.length; i++) {
-            let option = document.createElement("option");
-            option.setAttribute("value", data.canList[i].CANID);
-            option.innerText = data.canList[i].Name;
-            document.getElementById("canDropDown").appendChild(option);
-        }
-    })
+        .then(response => response.json())
+        .then((data) => {
+            for (let i = 0; i < data.canList.length; i++) {
+                let option = document.createElement("option");
+                option.setAttribute("value", data.canList[i].CANID);
+                option.innerText = data.canList[i].Name;
+                document.getElementById("canDropDown").appendChild(option);
+            }
+        })
 }
+
 
 
 /**
@@ -114,15 +118,16 @@ function addChart() {
 
         //deleting timeDropdown and selectTime elements because they are no longer needed
         let selectedTime = timeSelectElements[0].value;
-        timeSelectElements[1].remove();
-        timeSelectElements[0].remove();
+
+        while (timeSelectElements.length > 0) {
+            timeSelectElements[0].remove();
+        }
 
         createOptionElements(selectedCAN);
 
         // Creating interval that will requests new messages from server
         if (serverInterface.interval === undefined) {
             serverInterface.interval = setInterval(serverInterface.intervalFunction, serverInterface.intervaltime);
-            console.log("uusi interval luotu");
         }
 
 
@@ -177,11 +182,12 @@ function addChart() {
  */
 
 function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
-    let optionsDiv = document.getElementsByClassName("numberValues"  + latestMessage.canID);
+    let optionsDiv = document.getElementsByClassName("numberValues" + latestMessage.canID);
     let highestValue = optionsDiv[0];
     let currentValue = optionsDiv[1];
     let lowestValue = optionsDiv[2];
     let label = ticks / oneSec;
+    let value = parseFloat(latestMessage.data).toFixed(2);
 
     if (ticks >= startTime) {
         if ((label % 1 === 0)) {
@@ -193,19 +199,19 @@ function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
     }
 
     chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(latestMessage.data);
+        dataset.data.push(value);
         if (ticks > startTime) {
             dataset.data.shift();
         }
     });
 
-    if (latestMessage.data > highestValue.innerHTML) {
-        highestValue.innerHTML = latestMessage.data;
+    if (value > highestValue.innerHTML) {
+        highestValue.innerHTML = value;
     }
-    if (latestMessage.data < lowestValue.innerHTML) {
-        lowestValue.innerHTML = latestMessage.data;
+    if (value < lowestValue.innerHTML) {
+        lowestValue.innerHTML = value;
     }
-    currentValue.innerHTML = latestMessage.data;
+    currentValue.innerHTML = value;
 
     chart.update();
 }
@@ -315,7 +321,16 @@ function createChartElements(selectedCAN) {
     optionsDiv.setAttribute("class", "optionsDiv " + selectedCAN);
 
     // creating dropdown list where user can choose X axis length
+    const labelDiv = document.createElement("div");
+    labelDiv.setAttribute("class", "labelDiv selectTime " + selectedCAN);
+
+    const label = document.createElement("label");
+    label.setAttribute("for", "timeDropDown");
+    label.setAttribute("class", "optionLabel selectTime " + selectedCAN);
+    label.innerHTML = "Select X-axis time:";
+
     const timeDropDown = document.createElement("select");
+    timeDropDown.setAttribute("id", "timeDropDown");
     timeDropDown.setAttribute("name", "time");
     timeDropDown.setAttribute("class", "timeDropDown selectTime " + selectedCAN);
 
@@ -326,7 +341,7 @@ function createChartElements(selectedCAN) {
         option.innerHTML = xAxisOptionArray[i] + " sec";
         timeDropDown.appendChild(option);
     }
-
+    optionsDiv.appendChild(label);
     optionsDiv.appendChild(timeDropDown);
 
     // creating button for selecting the wanted time from dropdown list

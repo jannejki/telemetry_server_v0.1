@@ -32,10 +32,15 @@
 
     <main>
         <div id="addNewChart">
-            <select name="can" id="canDropDown">
-            </select>
-            <input type="button" id="selectCANBtn" value="Create new chart" onclick="addChart()">
-            </select>
+            <div class="optionsDiv" id="addNewChartOptions">
+                <div class="labelDiv">
+                    <label for="canDropDown" class="optionLabel">Select CAN:</label>
+                </div>
+                <select name="can" id="canDropDown">
+                </select>
+                <input type="button" id="selectCANBtn" value="Create" onclick="addChart()">
+                </select>
+            </div>
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
