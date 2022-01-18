@@ -8,15 +8,26 @@ const express = require('express');
 const app = express();
 const mqtt = require('mqtt');
 const bodyParser = require('body-parser');
-const { application } = require('express');
-
+const multer = require('multer');
+const fs = require('fs');
 
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
-
 const initializePassport = require('./passport-config')
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'database/dbcFiles');
+    },
+    filename: (req, file, cb) => {
+        const { originalname } = file;
+        cb(null, originalname);
+    }
+})
+
+const upload = multer({ storage })
 
 app.use(flash())
 app.use(session({
@@ -144,12 +155,54 @@ app.delete("/deleteCan", checkAuthenticated, async(req, res) => {
     }
 })
 
+app.post("/uploadDBC", upload.single('dbcFile'), (req, res) => {
+    return res.json({ status: 'saved' })
+})
+
+app.get("/loadDbcFiles", async(req, res) => {
+    await fs.readdir(path.join(__dirname, 'database/dbcFiles'), function(err, files) {
+        let fileArray = [];
+
+        //handling error
+        if (err) {
+            return console.log('Unable to scan directory: ' + err);
+        }
+        //listing all files using forEach
+        files.forEach(function(file) {
+            fileArray.push({ filename: file });
+        });
+        res.send({ files: fileArray }).status(204);
+    });
+})
+
+app.delete("/deleteFile", (req, res) => {
+    const path = './database/dbcFiles/' + req.body.filename;
+
+    try {
+        fs.unlinkSync(path)
+        res.sendStatus(204);
+    } catch (err) {
+        res.sendStatus(500);
+        console.log(err);
+    }
+});
+
+app.get("/downloadDbcFile", (req, res) => {
+    const path = './database/dbcFiles/' + req.query.filename;
+    fs.readFile(path, (err, data) => {
+        if (err) {
+            return next(err);
+        }
+        res.send(data);
+    })
+});
+
 //------------------------------------------------//
 //------------------MQTT--------------------------//
 
 // create MQTT OBJECT
 //const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
-const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "localhostServer" });
+const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "localhost" });
 
 // connecting to mqtt broker
 client.on("connect", function() {

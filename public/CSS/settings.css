@@ -2,8 +2,13 @@ html {
     background-color: #585b5d;
 }
 
-#newCanForm {
+#formDiv {
+    display: flex;
+}
+
+.settingsForm {
     width: 33%;
+    min-width: 245px;
     display: flex;
     flex-wrap: wrap;
     margin: auto;
@@ -12,6 +17,7 @@ html {
     font-weight: bold;
     justify-content: center;
     border-radius: 5px;
+    text-align: center;
 }
 
 .textInput {
@@ -27,13 +33,17 @@ html {
     padding: 1ch;
 }
 
-#canTable {
+#dbcFileInput {
+    margin: 1em;
+}
+
+.dataTable {
     border-collapse: collapse;
     width: 100%;
     margin-top: 1em;
 }
 
-#canTable td,
+.dataTable td,
 th {
     border: 1px solid #dddddd;
     background: white;

@@ -31,18 +31,35 @@
     </div>
 
     <main>
-        <form action="/newCAN" method="POST" id="newCanForm">
-            <div class="row">
-                <label for="canID">New canID:</label><br>
-                <input type="text" name="CANID" id="canID" class="textInput">
-            </div>
-            <div class="row">
-                <label for="canName">canID name:</label>
-                <input type="text" name="Name" id="canName" class="textInput">
-            </div>
-            <input type="submit">
-        </form>
-        <table id="canTable">
+        <div id="formDiv">
+            <form action="/newCAN" method="POST" id="newCanForm" class="settingsForm">
+                <div class="row">
+                    <label for="canID">New canID:</label><br>
+                    <input type="text" name="CANID" id="canID" class="textInput">
+                </div>
+                <div class="row">
+                    <label for="canName">canID name:</label>
+                    <input type="text" name="Name" id="canName" class="textInput">
+                </div>
+                <input type="submit">
+            </form>
+
+            <form action="/uploadDBC" method="POST" enctype="multipart/form-data" id="newDBCFileForm" class="settingsForm">
+                <div class="row">
+                    <label for="canID">Upload file:</label><br>
+                    <input type="file" name="dbcFile" id="dbcFileInput" required>
+                </div>
+                <input type="submit">
+            </form>
+        </div>
+        <table id="fileTable" class="dataTable">
+            <tr>
+                <th>Name</th>
+                <th>Delete</th>
+            </tr>
+        </table>
+
+        <table id="canTable" class="dataTable">
             <tr>
                 <th>ID</th>
                 <th>NAME</th>

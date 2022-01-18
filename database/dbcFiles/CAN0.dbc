@@ -1,0 +1,116 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_: ECU LeftInverter RightInverter IVT BMS Memerator Telemetry IMU Analog_Node_1
+
+
+BO_ 128 Sync: 1 ECU
+
+BO_ 1313 Current_IVT: 6 IVT
+ SG_ IVT_Current : 23|32@0- (0.001,0) [-2140000000|2140000000] "A" Vector__XXX
+
+BO_ 1314 Voltage1_IVT: 6 IVT
+ SG_ IVT_Voltage1 : 23|32@0- (0.001,0) [-2140000000|2140000000] "V" Vector__XXX
+
+BO_ 1315 Voltage2_IVT: 6 IVT
+ SG_ IVT_Voltage2 : 23|32@0- (0.001,0) [-2140000000|2140000000] "V" Vector__XXX
+
+BO_ 1316 Voltage3_IVT: 6 IVT
+ SG_ IVT_Voltage3 : 23|32@0- (0.001,0) [-2140000000|2140000000] "V" Vector__XXX
+
+BO_ 1317 Temperature_IVT: 6 IVT
+ SG_ IVT_Temperature : 23|32@0- (10,0) [-214000000|2140000000] "C" Vector__XXX
+
+BO_ 1318 Power_IVT: 6 IVT
+ SG_ IVT_Power : 23|32@0- (1,0) [-2140000000|2140000000] "W" Vector__XXX
+
+BO_ 1319 Coulumbs_IVT: 6 IVT
+ SG_ IVT_Coulumbs : 23|32@0- (1,0) [-2140000000|2140000000] "C" Vector__XXX
+
+BO_ 1320 Energy_IVT: 6 IVT
+ SG_ IVT_Energy : 23|32@0- (3600,0) [-2140000000|2140000000] "Ws" Vector__XXX
+
+BO_ 1041 IVT_CONFIG: 8 Vector__XXX
+
+BO_ 1296 IVT_DEBUG: 8 Vector__XXX
+
+BO_ 1297 IVT_RESPONSE: 8 Vector__XXX
+
+BO_ 32 Status_ECU: 8 ECU
+
+BO_ 34 Dash_LED_Status: 8 ECU
+
+BO_ 257 Time_Base_ECU: 8 ECU
+
+BO_ 1994 ECU_AIM_4: 8 ECU
+
+BO_ 0 NMT: 2 ECU
+
+BO_ 1536 Node_Error: 8 Vector__XXX
+
+BO_ 1537 Node_Configure: 8 Vector__XXX
+
+BO_ 1537 Node_Acknowledge: 8 Vector__XXX
+
+BO_ 1664 Node_Analog_1_Data: 6 Analog_Node_1
+ SG_ Dhab_Current : 7|16@0- (0.001,0) [0|0] "" Vector__XXX
+ SG_ Regen : 23|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ APPS_0 : 39|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1665 Node_Analog_1_Diag: 8 Analog_Node_1
+ SG_ Internal_Temperature : 7|16@0- (0.1,0) [0|0] "" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
+
+
+CM_ BU_ ECU "Visa needs to add IDs";
+CM_ BU_ LeftInverter "need to add IDs";
+CM_ BU_ RightInverter "need to add IDs";
+CM_ BU_ BMS "Does Not Send";
+CM_ BU_ Memerator "Visa needs to add RTC ID";
+CM_ BU_ Telemetry "Does Not Send";
+CM_ BU_ IMU "Matti needs to add IDs";
+CM_ BU_ Analog_Node_1 "Pedro calls this Front Middle";
+CM_ SG_ 1313 IVT_Current "";
+CM_ SG_ 1314 IVT_Voltage1 "rename this with whatever it is";
+CM_ SG_ 1315 IVT_Voltage2 "mark whichever this one is";
+CM_ SG_ 1316 IVT_Voltage3 "mark whichever this one is";
+CM_ SG_ 1318 IVT_Power "";
+CM_ SG_ 1319 IVT_Coulumbs "";
+CM_ SG_ 1320 IVT_Energy "";
+CM_ BO_ 1041 "Do Not Send";
+CM_ BO_ 1296 "Do Not Send";
+CM_ BO_ 1297 "Do Not Send";
+CM_ BO_ 1994 "";
+CM_ BO_ 1536 "error message from a can node";
+CM_ BO_ 1537 "used to configure can nodes";
+CM_ BO_ 1537 "can node response to configuration message";
+CM_ BO_ 1664 "";
+CM_ SG_ 1664 Dhab_Current "A";
+CM_ SG_ 1664 Regen "0 to 4095";
+CM_ SG_ 1664 APPS_0 "0 to 4095";
+CM_ SG_ 1665 Internal_Temperature "°C";
+CM_ SG_ 1665 Driver_Current "A";
