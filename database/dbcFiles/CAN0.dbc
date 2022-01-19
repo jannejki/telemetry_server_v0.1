@@ -30,6 +30,12 @@ BU_: ECU LeftInverter RightInverter IVT BMS Memerator Telemetry IMU Analog_Node_
 
 BO_ 128 Sync: 1 ECU
 
+BO_ ID1 test: 8 Vector__XXX
+ SG_ EngineSpeed : 24|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
+
+BO_ 2364540158 EEC1: 8 Vector__XXX
+ SG_ EngineSpeed : 24|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
+
 BO_ 1313 Current_IVT: 6 IVT
  SG_ IVT_Current : 23|32@0- (0.001,0) [-2140000000|2140000000] "A" Vector__XXX
 
@@ -112,5 +118,5 @@ CM_ BO_ 1664 "";
 CM_ SG_ 1664 Dhab_Current "A";
 CM_ SG_ 1664 Regen "0 to 4095";
 CM_ SG_ 1664 APPS_0 "0 to 4095";
-CM_ SG_ 1665 Internal_Temperature "°C";
+CM_ SG_ 1665 Internal_Temperature "ï¿½C";
 CM_ SG_ 1665 Driver_Current "A";

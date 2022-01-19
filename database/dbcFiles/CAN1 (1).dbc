@@ -1,0 +1,251 @@
+VERSION "HIPBNYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/4/%%%/4/'%**4YYY///"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+
+BS_:
+
+BU_: BMS ECU Telemetry Memerator Analog_Node_9 Analog_Node_10 Analog_Node_11 Analog_Node_12 Analog_Node_13 Analog_Node_14 Power_Node_33 Power_Node_34 Power_Node_35 Power_Node_36 Analog_Node_15 Analog_Node_16 Analog_Node_17 Analog_Node_18 Power_Node_37
+
+
+BO_ 1990 ECU_AIM_0: 8 ECU
+
+BO_ 1991 ECU_AIM_1: 8 ECU
+
+BO_ 1992 ECU_AIM_2: 8 ECU
+
+BO_ 1993 ECU_AIM_3: 8 ECU
+
+BO_ 1994 ECU_AIM_4: 8 ECU
+
+BO_ 1995 ECU_AIM_5: 8 ECU
+
+BO_ 1996 ECU_AIM_6: 8 ECU
+
+BO_ 34 Dash_LED_Status: 8 ECU
+
+BO_ 257 Time_Base_ECU: 8 ECU
+
+BO_ 32 Status_ECU: 8 ECU
+
+BO_ 128 Sync: 1 ECU
+
+BO_ 0 NMT: 2 ECU
+
+BO_ 8 Opmode_BMS: 8 BMS
+ SG_ Uptime : 7|32@0+ (1,0) [0|0] "s" Vector__XXX
+ SG_ Opmode : 39|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Reason : 47|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Precharge_Flag : 55|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Air_Flag : 63|8@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 9 Pec_Error_BMS: 8 BMS
+ SG_ Pec_Total : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Pec_Delta : 39|32@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 10 Data_BMS: 8 BMS
+ SG_ Accumulator_Voltage : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Voltage_Min : 39|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Voltage_Max : 47|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_Max : 55|8@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1900 BMS_Spam_Start: 8 BMS
+
+BO_ 1971 BMS_Spam_End: 8 BMS
+
+BO_ 1536 Node_Error: 8 Vector__XXX
+
+BO_ 1538 Node_Configure: 8 Vector__XXX
+
+BO_ 1537 Node_Acknowledge: 8 Vector__XXX
+
+BO_ 1680 Node_Analog_9_Data: 4 Analog_Node_9
+ SG_ Water_Temperature_Front_Left : 31|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Brake_Temperature_Front_Left : 7|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ Oil_Temperature_Front_Left : 23|8@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1681 Node_Analog_9_Diag: 8 Analog_Node_9
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
+
+BO_ 1683 Node_Analog_10_Diag: 8 Analog_Node_10
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
+
+BO_ 1682 Node_Analog_10_Data: 6 Analog_Node_10
+ SG_ Water_Temperature_Front_Right : 31|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Suspension_Front_Left : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Suspension_Front_Right : 39|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Oil_Temperature_Front_Right : 23|8@0+ (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1685 Node_Analog_11_Diag: 8 Analog_Node_11
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1684 Node_Analog_11_Data: 8 Analog_Node_11
+ SG_ Brake_Temperature_Front_Left : 55|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Brake_Pressure_Front : 39|16@0- (0.1,0) [0|0] "bar" Vector__XXX
+ SG_ Brake_Pressure_Back : 23|16@0- (0.1,0) [0|0] "bar" Vector__XXX
+ SG_ APPS1 : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1687 Node_Analog_12_Diag: 8 Analog_Node_12
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
+
+BO_ 1686 Node_Analog_12_Data: 4 Analog_Node_12
+ SG_ Water_Temperature_Left_Before : 7|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Water_Temperature_Left_After : 15|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Water_Temperature_Right_After : 31|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Water_Temperature_Right_Before : 23|8@0+ (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1689 Node_Analog_13_Diag: 8 Analog_Node_13
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
+
+BO_ 1688 Node_Analog_13_Data: 4 Analog_Node_13
+ SG_ Suspension_Back_Left : 7|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Suspension_Back_Right : 23|16@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1691 Node_Analog_14_Diag: 8 Analog_Node_14
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
+
+BO_ 1690 Node_Analog_14_Data: 6 Analog_Node_14
+ SG_ Oil_Tempearture_Back_Left : 47|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Oil_Temperature_Back_Right : 39|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Brake_Temperature_Back_Left : 23|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Brake_Temperature_Back_Right : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1693 Node_Analog_15_Diag: 8 Analog_Node_15
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
+
+BO_ 1695 Node_Analog_16_Diag: 8 Analog_Node_16
+ SG_ Internal_Temperature : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ NewSignal46 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1697 Node_Analog_17_Diag: 8 Analog_Node_17
+
+BO_ 1699 Node_Analog_18_Diag: 8 Analog_Node_18
+
+BO_ 1692 Node_Analog_15_Data: 3 Analog_Node_15
+ SG_ Tire_Temperature_Front_Left_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Front_Left_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Front_Left_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1694 Node_Analog_16_Data: 3 Analog_Node_16
+ SG_ Tire_Temperature_Front_Right_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Front_Right_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Front_Right_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1696 Node_Analog_17_Data: 3 Analog_Node_17
+ SG_ Tire_Temperature_Rear_Left_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Left_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperatuer_Rear_Left_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1698 Node_Analog_18_Data: 3 Analog_Node_18
+ SG_ Tire_Temperature_Rear_Right_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Right_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Right_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+
+BO_ 1710 Node_Power_33_Info: 3 Power_Node_33
+ SG_ Digital_In : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ I_Telementry : 15|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_Front : 23|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+
+BO_ 1711 Node_Power_34_Info: 4 Power_Node_34
+ SG_ Digital_In : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ I_Inverters : 15|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_ECU : 23|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_Front : 31|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+
+BO_ 1712 Node_Power_35_Info: 4 Power_Node_35
+ SG_ I_LeftFans : 7|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_RightFans : 15|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_LeftPump : 23|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_RightPump : 31|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+
+BO_ 1713 Node_Power_36_Info: 8 Power_Node_36
+ SG_ I_BrakeLight : 7|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_Buzzers : 15|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_IVT : 23|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_AccuPCBs : 31|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_AccuFans : 39|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Freq_IMD : 47|16@0+ (1,0) [0|0] "Hz" Vector__XXX
+ SG_ DC_IMD : 63|8@0+ (1,0) [0|0] "%" Vector__XXX
+
+BO_ 1714 Node_Power_37_Info: 3 Power_Node_37
+ SG_ Digital_In : 7|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ I_currentMeasurement : 15|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+ SG_ I_TSAL : 23|8@0+ (0.1,0) [0|0] "A" Vector__XXX
+
+
+CM_ BU_ Telemetry "Does Not Send";
+CM_ BU_ Memerator "Does Not Send";
+CM_ BU_ Analog_Node_9 "Pedro calls this Front Left";
+CM_ BU_ Analog_Node_10 "Pedro calls this Front Right 1";
+CM_ BU_ Analog_Node_11 "Pedro calls this Front Right 2";
+CM_ BU_ Analog_Node_12 "Pedro calls this Back Middle";
+CM_ BU_ Analog_Node_13 "Pedro calls this Back Left";
+CM_ BU_ Analog_Node_14 "Pedro calls this Back Right";
+CM_ BU_ Power_Node_33 "Pedro calls this Back Left";
+CM_ BU_ Power_Node_34 "Pedro calls this Back Right";
+CM_ BU_ Power_Node_35 "Pedro calls this Front Left";
+CM_ BU_ Power_Node_36 "Accumulator Node";
+CM_ BU_ Analog_Node_15 "Pedro calls this Front Left Temperature";
+CM_ BU_ Analog_Node_16 "Pedro calls this Front Right Temperature";
+CM_ BU_ Analog_Node_17 "Pedro calls this Rear Left Temperature";
+CM_ BU_ Analog_Node_18 "Pedro calls this Rear Right Temperature";
+CM_ BU_ Power_Node_37 "Distribution Box Node";
+CM_ BO_ 1900 "nothing between the BMS spam, it is for all voltages and temperatures";
+CM_ BO_ 1971 "nothing between the BMS spam, it is for all voltages and temperatures";
+CM_ BO_ 1536 "error message from a can node";
+CM_ BO_ 1538 "used to configure can nodes";
+CM_ BO_ 1537 "can node response to configuration message";
+CM_ SG_ 1680 Water_Temperature_Front_Left "°C";
+CM_ SG_ 1680 Brake_Temperature_Front_Left "°C";
+CM_ SG_ 1680 Oil_Temperature_Front_Left "°C";
+CM_ SG_ 1681 Internal_Temperature "";
+CM_ SG_ 1681 Driver_Current "";
+CM_ SG_ 1682 Suspension_Front_Left "need to set units and factor";
+CM_ SG_ 1682 Suspension_Front_Right "need to set units and factor";
+CM_ SG_ 1685 Driver_Current "A";
+CM_ SG_ 1685 Internal_Temperature "°C";
+CM_ SG_ 1684 Brake_Temperature_Front_Left "";
+CM_ SG_ 1684 Brake_Pressure_Front "need to check units and factor and length";
+CM_ SG_ 1684 Brake_Pressure_Back "need to check units and factor and length";
+CM_ BO_ 1687 "";
+CM_ SG_ 1687 Internal_Temperature "°C";
+CM_ SG_ 1687 Driver_Current "A";
+CM_ SG_ 1686 Water_Temperature_Left_Before "";
+CM_ SG_ 1686 Water_Temperature_Left_After "";
+CM_ SG_ 1689 Internal_Temperature "";
+CM_ SG_ 1689 Driver_Current "";
+CM_ SG_ 1688 Suspension_Back_Left "need to set units and factor";
+CM_ SG_ 1688 Suspension_Back_Right "need to set units and factor";
+CM_ SG_ 1691 Internal_Temperature "";
+CM_ SG_ 1690 Oil_Temperature_Back_Right "";
+CM_ SG_ 1694 Tire_Temperature_Front_Right_Inside "";
+CM_ SG_ 1696 Tire_Temperature_Rear_Left_Inside "";
+CM_ SG_ 1710 Digital_In "[x][x][x][BOTS][BSPD before delay][BSPD after delay][x][Inertia Switch]";
+CM_ SG_ 1711 Digital_In "//[x][x][x][Shutdown Button][Shutdown Button][Shutdown Button][x][x]";

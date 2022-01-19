@@ -39,13 +39,16 @@ function refreshFileTable() {
     let nameTh = document.createElement("th");
     let downloadTh = document.createElement("th");
     let deleteTh = document.createElement("th");
+    let inUseTh = document.createElement("th");
 
     nameTh.innerHTML = "File";
-    downloadTh.innerHTML = "Download";
+    downloadTh.innerHTML = "Download not working";
     deleteTh.innerHTML = "Delete";
+    inUseTh.innerHTML = "In use (click to change)";
     tr.appendChild(nameTh);
     tr.appendChild(downloadTh);
     tr.appendChild(deleteTh);
+    tr.appendChild(inUseTh);
 
     table.innerHTML = "";
     table.appendChild(tr);
@@ -63,9 +66,12 @@ function refreshFileTable() {
                 let deleteButton = document.createElement("button");
                 deleteButton.setAttribute("value", "delete");
                 deleteButton.setAttribute("class", "deleteCan");
-                deleteButton.setAttribute("id", data.files[0].filename);
+                deleteButton.setAttribute("id", data.files[i].filename);
                 deleteButton.setAttribute("onclick", "deleteDbcFile(this.id)");
                 deleteButton.innerHTML = "Delete file";
+
+                // if file is in use, disable deleteButton
+                if (data.files[i].using) deleteButton.disabled = true;
 
                 deletetd.appendChild(deleteButton);
 
@@ -73,25 +79,53 @@ function refreshFileTable() {
                 let downloadButton = document.createElement("button");
                 downloadButton.setAttribute("value", "download");
                 downloadButton.setAttribute("class", "deleteCan");
-                downloadButton.setAttribute("id", data.files[0].filename);
+                downloadButton.setAttribute("id", data.files[i].filename);
                 downloadButton.setAttribute("onclick", "downloadDbcFile(this.id)");
                 downloadButton.innerHTML = "Download file";
-
+                downloadButton.disabled = true;
                 downloadTd.appendChild(downloadButton);
 
+                let inUseTd = document.createElement("td");
+
+
+                switch (data.files[i].using) {
+                    case true:
+                        inUseTd.innerHTML = "active";
+                        inUseTd.setAttribute("class", "activeFile");
+                        break;
+                    case false:
+                        inUseTd.innerHTML = "not active";
+                        inUseTd.setAttribute("class", "notActiveFile");
+                        inUseTd.setAttribute("id", data.files[i].filename);
+                        inUseTd.setAttribute("onclick", "changeDbcFile(this.id)");
+                        break;
+                }
                 tr.appendChild(nametd);
                 tr.appendChild(downloadTd);
                 tr.appendChild(deletetd);
-
+                tr.appendChild(inUseTd);
                 table.appendChild(tr);
             }
         })
 }
 
 
+function changeDbcFile(filename) {
+    fetch('/changeDbcFile/?filename=' + filename)
+        .then(response => {
+            if (response.status === 204) {
+                refreshFileTable();
+                refreshCanTable();
+            }
+            if (response.status === 500) alert("Something went wrong! can't change file");
+        })
+}
+
 //--------------------------------------------//
 //--------------FOR CAN TABLE-----------------//
-document.forms['newCanForm'].addEventListener('submit', (event) => {
+
+// TODO is can table useless?
+/*document.forms['newCanForm'].addEventListener('submit', (event) => {
     event.preventDefault();
     // TODO do something here to show user that form is being submitted
     fetch(event.target.action, {
@@ -109,7 +143,7 @@ document.forms['newCanForm'].addEventListener('submit', (event) => {
     }).catch((error) => {
         // TODO handle error
     });
-});
+});*/
 
 function refreshCanTable() {
     let table = document.getElementById("canTable");
@@ -117,14 +151,18 @@ function refreshCanTable() {
 
     let idTh = document.createElement("th");
     let nameTh = document.createElement("th");
+
+    /* delete column for table deprecated 19.1.2022
+    
     let deleteTh = document.createElement("th");
+    deleteTh.innerHTML = "Delete";
+    tr.appendChild(deleteTh);
+    */
 
     idTh.innerHTML = "ID";
-    nameTh.innerHTML = "File";
-    deleteTh.innerHTML = "Delete";
+    nameTh.innerHTML = "Name";
     tr.appendChild(idTh);
     tr.appendChild(nameTh);
-    tr.appendChild(deleteTh);
 
     table.innerHTML = "";
     table.appendChild(tr);
@@ -136,23 +174,25 @@ function refreshCanTable() {
                 let IDtd = document.createElement("td");
                 let nametd = document.createElement("td");
 
-                IDtd.innerText = data.canList[i].CANID;
-                nametd.innerText = data.canList[i].Name;
+                IDtd.innerText = data.canList[i].canID;
+                nametd.innerText = data.canList[i].name;
+
+                /* delete button to table, deprecated 19.1.2022
 
                 let deletetd = document.createElement("td");
                 let deleteButton = document.createElement("button");
                 deleteButton.setAttribute("value", "delete");
                 deleteButton.setAttribute("class", "deleteCan");
-                deleteButton.setAttribute("id", data.canList[i].CANID);
+                deleteButton.setAttribute("id", data.canList[i].canID);
                 deleteButton.setAttribute("onclick", "deleteCan(this.id)");
                 deleteButton.innerHTML = "Delete can";
 
                 deletetd.appendChild(deleteButton);
+                tr.appendChild(deletetd);*/
 
 
                 tr.appendChild(IDtd);
                 tr.appendChild(nametd);
-                tr.appendChild(deletetd);
 
                 table.appendChild(tr);
             }

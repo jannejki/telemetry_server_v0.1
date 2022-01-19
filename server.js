@@ -10,6 +10,9 @@ const mqtt = require('mqtt');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const fs = require('fs');
+const DBCParser = require('./DBC.js');
+
+const dbcParser = new DBCParser.DbcParser("CAN0.dbc");
 
 const bcrypt = require('bcrypt')
 const passport = require('passport')
@@ -91,7 +94,6 @@ app.post('/logout', (req, res) => {
 //---------------ROUTES---------------------------//
 app.get('/', checkAuthenticated, (req, res) => {
     // Send a landing page
-    console.log("/");
     res.sendFile(path.join(__dirname, '/views/index.html'));
 });
 
@@ -140,8 +142,9 @@ app.get("/updateLive", checkAuthenticated, async(req, res) => {
 })
 
 app.get("/loadCans", checkAuthenticated, async(req, res) => {
-    let canList = await db.select().from("canID");
+    let canList = dbcParser.getCanNames();
     console.log(canList);
+
     res.send({ canList: canList }).status(204);
 })
 
@@ -169,7 +172,7 @@ app.get("/loadDbcFiles", async(req, res) => {
         }
         //listing all files using forEach
         files.forEach(function(file) {
-            fileArray.push({ filename: file });
+            fileArray.push({ filename: file, using: file == dbcParser.dbcFileName });
         });
         res.send({ files: fileArray }).status(204);
     });
@@ -197,12 +200,25 @@ app.get("/downloadDbcFile", (req, res) => {
     })
 });
 
+
+app.get("/changeDbcFile", async(req, res) => {
+    const fileName = req.query.filename;
+    console.log(fileName);
+    try {
+        dbcParser.loadDbcFile(fileName);
+        await db("activeSettings").where({ name: "dbcFile" }).update({ status: fileName });
+        res.sendStatus(204);
+    } catch (error) {
+        res.send(error).status(500);
+    }
+})
+
 //------------------------------------------------//
 //------------------MQTT--------------------------//
 
 // create MQTT OBJECT
-//const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
-const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "localhost" });
+const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
+//const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "pc" });
 
 // connecting to mqtt broker
 client.on("connect", function() {
@@ -232,6 +248,16 @@ const db = require('knex')({
     },
     useNullAsDefault: true
 });
+
+
+/**
+ * changing dbc file to the one that was selected before shutting down
+ */
+async function loadDbc() {
+    let dbcFile = await db("activeSettings").where({ name: "dbcFile" });
+    dbcParser.loadDbcFile(dbcFile[0].status);
+}
+loadDbc();
 
 //TODO: save data
 /**

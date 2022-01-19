@@ -20,6 +20,12 @@ function ChartSettings() {
 
     this.options = {
         animation: false,
+        lineTension: 0.4,
+        elements: {
+            point: {
+                radius: 0
+            }
+        },
         scales: {
             y: {
                 min: 0,

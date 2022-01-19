@@ -21,56 +21,85 @@ let lastMessage;
  */
 let xAxisOptionArray = [10, 30, 60, 90, 120, 180];
 
-
+/**
+ * @constructor
+ * Constructor function for object that will handle all communicating between server and client.
+ */
 function ServerInterface() {
     this.idArray = { "canID": [] },
         this.interval = undefined,
         this.latestMessage = undefined,
         this.intervaltime = 100,
 
+        // Adds new canID to a array that is sent to server to ask the latest messages from the
+        // can ids that are in array. 
         this.addNewId = function(canID) {
             this.idArray["canID"].push({ can: canID })
-        }
+        },
 
-    this.intervalFunction = () => {
-        let response = new Promise(resolve => {
-            fetch('/updateLive/?can=' + JSON.stringify(this.idArray["canID"]))
-                .then(response => response.json())
-                .then((data) => {
-                    resolve(data);
-                })
-        })
+        // interval function that will be used in a interval to ask messages from server.
+        this.intervalFunction = () => {
+            let response = new Promise(resolve => {
+                try {
+                    fetch('/updateLive/?can=' + JSON.stringify(this.idArray["canID"]))
+                        .then(response => response.json())
+                        .then((data) => {
+                            resolve(data);
+                        })
+                } catch (error) {
+                    resolve({ null: null });
+                }
+            })
 
-        response.then(values => {
-            this.latestMessage = values;
-        })
-    }
+            response.then(values => {
+                this.latestMessage = values;
+            })
+        },
 
-    this.deleteCan = (canID) => {
-        for (let i = 0; i < this.idArray["canID"].length; i++) {
-            if (this.idArray["canID"][i].can === canID) {
-                this.idArray["canID"].splice(i, 1);
+        // Deletes can ID from the canID array. 
+        this.deleteCan = (canID) => {
+            for (let i = 0; i < this.idArray["canID"].length; i++) {
+                if (this.idArray["canID"][i].can === canID) {
+                    this.idArray["canID"].splice(i, 1);
+                }
             }
-        }
 
-        if (this.idArray["canID"].length === 0) {
-            clearInterval(this.interval);
-            this.interval = undefined;
-        }
-    }
-
-    this.getLatestMessages = (canID) => {
-        for (let i = 0; i < this.latestMessage.data.length; i++) {
-            if (this.latestMessage.data[i][0].canID === canID) {
-                return this.latestMessage.data[i][0];
+            if (this.idArray["canID"].length === 0) {
+                clearInterval(this.interval);
+                this.interval = undefined;
             }
-            return false;
-        }
-    }
+        },
 
-    this.getIdArray = function() {
-        return this.idArray;
-    }
+        // returns the latest message with correspoding can ID
+        this.getLatestMessages = (canID) => {
+            try {
+                for (let i = 0; i < this.latestMessage.data.length; i++) {
+                    if (this.latestMessage.data[i][0].canID === canID) {
+                        return this.latestMessage.data[i][0];
+                    }
+                    return {
+                        "ID": undefined,
+                        "canID": canID,
+                        "data": "0",
+                        "timestamp": undefined,
+                        "DLC": undefined
+                    }
+                }
+            } catch (error) {
+                console.warn(error);
+                return {
+                    "ID": undefined,
+                    "canID": canID,
+                    "data": "0",
+                    "timestamp": undefined,
+                    "DLC": undefined
+                }
+            }
+        },
+
+        this.getIdArray = function() {
+            return this.idArray;
+        }
 }
 
 const serverInterface = new ServerInterface();
@@ -81,21 +110,21 @@ window.onload = () => {
         .then((data) => {
             for (let i = 0; i < data.canList.length; i++) {
                 let option = document.createElement("option");
-                option.setAttribute("value", data.canList[i].CANID);
-                option.innerText = data.canList[i].Name;
+                option.setAttribute("value", data.canList[i].canID);
+                option.innerText = data.canList[i].name;
                 document.getElementById("canDropDown").appendChild(option);
             }
         })
 }
-
-
 
 /**
  * Creates new chart div to "main" and creates new Chart -object to it.
  * Uses createChartElements() and createOptionElements() to create elements.
  */
 function addChart() {
-    let selectedCAN = document.getElementById("canDropDown").value;
+    let select = document.getElementById("canDropDown");
+    let selectedCAN = select.value;
+    let selectedName = select.options[select.selectedIndex].text;
     let chart;
     let ticks = 1;
     serverInterface.addNewId(selectedCAN);
@@ -104,8 +133,7 @@ function addChart() {
     let chartSettings = new ChartSettings();
     let chartData = chartSettings.data;
     let chartOptions = chartSettings.options;
-
-    chartData.datasets[0].label = selectedCAN;
+    chartData.datasets[0].label = selectedName;
 
     createChartElements(selectedCAN);
 
@@ -116,13 +144,15 @@ function addChart() {
     // Creating eventListener for selecting x-axis time.
     selectTimeButton.addEventListener("click", () => {
 
-        //deleting timeDropdown and selectTime elements because they are no longer needed
-        let selectedTime = timeSelectElements[0].value;
+        // saving selected time from time drop down list
+        let selectedTime = timeSelectElements[1].value;
 
+        //deleting timeDropdown and selectTime elements because they are no longer needed
         while (timeSelectElements.length > 0) {
             timeSelectElements[0].remove();
         }
 
+        // Creating elemnts to "option" div
         createOptionElements(selectedCAN);
 
         // Creating interval that will requests new messages from server
@@ -171,130 +201,6 @@ function addChart() {
     });
 }
 
-
-/**
- * @brief function updates chart data.
- * @param latestMessage {text} latest message that was received
- * @param chart {object} Chart that will be updated
- * @param ticks {int}   number that gets incremented by 1 every time chart is updated
- * @param startTime {int} amount of labels that are already in charts X-axis
- * @param oneSec {number} amount of ticks that correspond one second in X-axis
- */
-
-function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
-    let optionsDiv = document.getElementsByClassName("numberValues" + latestMessage.canID);
-    let highestValue = optionsDiv[0];
-    let currentValue = optionsDiv[1];
-    let lowestValue = optionsDiv[2];
-    let label = ticks / oneSec;
-    let value = parseFloat(latestMessage.data).toFixed(2);
-
-    if (ticks >= startTime) {
-        if ((label % 1 === 0)) {
-            chart.data.labels.push(label);
-        } else {
-            chart.data.labels.push("");
-        }
-        chart.data.labels.shift();
-    }
-
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(value);
-        if (ticks > startTime) {
-            dataset.data.shift();
-        }
-    });
-
-    if (value > highestValue.innerHTML) {
-        highestValue.innerHTML = value;
-    }
-    if (value < lowestValue.innerHTML) {
-        lowestValue.innerHTML = value;
-    }
-    currentValue.innerHTML = value;
-
-    chart.update();
-}
-
-/**
- * @brief Creating elements for optionsDiv
- * @param selectedCAN {string}
- */
-function createOptionElements(selectedCAN) {
-    let canDivs = document.getElementsByClassName(selectedCAN);
-    let optionsDiv = canDivs[2];
-    let chartDiv = canDivs[0];
-
-    // Creating button for deleting chart.
-    const removeButtonDiv = document.createElement("div");
-    removeButtonDiv.setAttribute("class", "removeButtonDiv");
-
-    const removeElementBtn = document.createElement("input");
-    removeElementBtn.setAttribute("type", "button");
-    removeElementBtn.setAttribute("value", "delete");
-    removeElementBtn.setAttribute("class", "deleteChartButton");
-    removeElementBtn.setAttribute("id", "delete" + selectedCAN + "Button");
-    removeElementBtn.addEventListener("click", () => {
-        document.getElementById(selectedCAN).remove();
-        serverInterface.deleteCan(selectedCAN);
-    });
-
-    removeButtonDiv.appendChild(removeElementBtn);
-    optionsDiv.appendChild(removeButtonDiv);
-
-    // // creating div and elements for current value
-    const currentDiv = document.createElement("div");
-    currentDiv.setAttribute("class", "infoDiv " + selectedCAN);
-
-    const currentLabel = document.createElement("label");
-    currentLabel.setAttribute("for", "currentValue");
-    currentLabel.setAttribute("class", "numberValuesLabel");
-    currentLabel.innerHTML = "Current: ";
-
-    let currentValue = document.createElement("p");
-    currentValue.setAttribute("id", "currentValue");
-    currentValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
-
-
-    // creating div and elements for highest value
-    const highestDiv = document.createElement("div");
-    highestDiv.setAttribute("class", "infoDiv " + selectedCAN);
-
-    let highestValue = document.createElement("p");
-    highestValue.setAttribute("id", "highestValue");
-    highestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
-
-    const highestLabel = document.createElement("label");
-    highestLabel.setAttribute("for", "highestValue");
-    highestLabel.setAttribute("class", "numberValuesLabel");
-    highestLabel.innerHTML = "Highest: ";
-
-
-    // creating div and elements for lowest value
-    const lowestDiv = document.createElement("div");
-    lowestDiv.setAttribute("class", "infoDiv " + selectedCAN);
-
-    const lowestLabel = document.createElement("label");
-    lowestLabel.setAttribute("for", "lowestValue");
-    lowestLabel.setAttribute("class", "numberValuesLabel");
-    lowestLabel.innerHTML = "Lowest: ";
-
-    let lowestValue = document.createElement("p");
-    lowestValue.setAttribute("id", "lowestValue");
-    lowestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
-    lowestValue.innerHTML = "99";
-
-    highestDiv.appendChild(highestLabel);
-    highestDiv.appendChild(highestValue);
-    currentDiv.appendChild(currentLabel);
-    currentDiv.appendChild(currentValue);
-    lowestDiv.appendChild(lowestLabel);
-    lowestDiv.appendChild(lowestValue);
-
-    optionsDiv.appendChild(highestDiv);
-    optionsDiv.appendChild(currentDiv);
-    optionsDiv.appendChild(lowestDiv);
-}
 
 /**
  * @brief Creating HTML elements for chart
@@ -355,4 +261,132 @@ function createChartElements(selectedCAN) {
     dataDiv.appendChild(chartContainer);
     dataDiv.appendChild(optionsDiv);
     document.querySelector("main").insertBefore(dataDiv, document.getElementById("addNewChart"));
+}
+
+
+/**
+ * @brief Creating elements for optionsDiv
+ * @param selectedCAN {string}
+ */
+function createOptionElements(selectedCAN) {
+    let canDivs = document.getElementsByClassName(selectedCAN);
+    let optionsDiv = canDivs[2];
+    let chartDiv = canDivs[0];
+
+    // Creating button for deleting chart.
+    const removeButtonDiv = document.createElement("div");
+    removeButtonDiv.setAttribute("class", "removeButtonDiv");
+
+    const removeElementBtn = document.createElement("input");
+    removeElementBtn.setAttribute("type", "button");
+    removeElementBtn.setAttribute("value", "delete");
+    removeElementBtn.setAttribute("class", "deleteChartButton");
+    removeElementBtn.setAttribute("id", "delete" + selectedCAN + "Button");
+    removeElementBtn.addEventListener("click", () => {
+        document.getElementById(selectedCAN).remove();
+        serverInterface.deleteCan(selectedCAN);
+    });
+
+    removeButtonDiv.appendChild(removeElementBtn);
+    optionsDiv.appendChild(removeButtonDiv);
+
+    // // creating div and elements for current value
+    const currentDiv = document.createElement("div");
+    currentDiv.setAttribute("class", "infoDiv " + selectedCAN);
+
+    const currentLabel = document.createElement("label");
+    currentLabel.setAttribute("for", "currentValue");
+    currentLabel.setAttribute("class", "numberValuesLabel");
+    currentLabel.innerHTML = "Current: ";
+
+    let currentValue = document.createElement("p");
+    currentValue.setAttribute("id", "currentValue");
+    currentValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
+    currentValue.innerHTML = "0";
+
+
+    // creating div and elements for highest value
+    const highestDiv = document.createElement("div");
+    highestDiv.setAttribute("class", "infoDiv " + selectedCAN);
+
+    let highestValue = document.createElement("p");
+    highestValue.setAttribute("id", "highestValue");
+    highestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
+    highestValue.innerHTML = "0";
+
+    const highestLabel = document.createElement("label");
+    highestLabel.setAttribute("for", "highestValue");
+    highestLabel.setAttribute("class", "numberValuesLabel");
+    highestLabel.innerHTML = "Highest: ";
+
+
+    // creating div and elements for lowest value
+    const lowestDiv = document.createElement("div");
+    lowestDiv.setAttribute("class", "infoDiv " + selectedCAN);
+
+    const lowestLabel = document.createElement("label");
+    lowestLabel.setAttribute("for", "lowestValue");
+    lowestLabel.setAttribute("class", "numberValuesLabel");
+    lowestLabel.innerHTML = "Lowest: ";
+
+    let lowestValue = document.createElement("p");
+    lowestValue.setAttribute("id", "lowestValue");
+    lowestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
+    lowestValue.innerHTML = "99";
+
+    highestDiv.appendChild(highestLabel);
+    highestDiv.appendChild(highestValue);
+    currentDiv.appendChild(currentLabel);
+    currentDiv.appendChild(currentValue);
+    lowestDiv.appendChild(lowestLabel);
+    lowestDiv.appendChild(lowestValue);
+
+    optionsDiv.appendChild(highestDiv);
+    optionsDiv.appendChild(currentDiv);
+    optionsDiv.appendChild(lowestDiv);
+}
+
+
+
+/**
+ * @brief function updates chart data.
+ * @param latestMessage {text} latest message that was received
+ * @param chart {object} Chart that will be updated
+ * @param ticks {int}   number that gets incremented by 1 every time chart is updated
+ * @param startTime {int} amount of labels that are already in charts X-axis
+ * @param oneSec {number} amount of ticks that correspond one second in X-axis
+ */
+function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
+    let optionsDiv = document.getElementsByClassName("numberValues" + latestMessage.canID);
+    let highestValue = optionsDiv[0];
+    let currentValue = optionsDiv[1];
+    let lowestValue = optionsDiv[2];
+    let label = ticks / oneSec;
+    let value = parseFloat(latestMessage.data).toFixed(2);
+
+    if (ticks >= startTime) {
+        if ((label % 1 === 0)) {
+            chart.data.labels.push(label);
+        } else {
+            chart.data.labels.push("");
+        }
+        chart.data.labels.shift();
+    }
+
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(value);
+        if (ticks > startTime) {
+            dataset.data.shift();
+        }
+    });
+
+    if (value > highestValue.innerHTML) {
+        highestValue.innerHTML = value;
+    }
+    if (value < lowestValue.innerHTML) {
+        lowestValue.innerHTML = value;
+    }
+    currentValue.innerHTML = value;
+
+    chart.update();
 }

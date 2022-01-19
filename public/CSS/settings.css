@@ -49,5 +49,17 @@ th {
     background: white;
     text-align: left;
     padding: 8px;
-    width: 33%;
+    width: 25%;
+}
+
+.activeFile {
+    background-color: rgb(18, 212, 0)!important;
+}
+
+.notActiveFile {
+    background-color: rgb(175, 0, 0)!important;
+}
+
+.notActiveFile:hover {
+    cursor: pointer;
 }

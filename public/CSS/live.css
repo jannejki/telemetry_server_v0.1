@@ -25,6 +25,7 @@ html {
 }
 
 #canDropDown {
+    width: 100%;
     margin: 1em auto;
 }
 
@@ -47,6 +48,7 @@ html {
 
 .optionsDiv {
     width: 10%;
+    min-width: 80px;
     display: flex;
     flex-wrap: wrap;
     border-style: solid;
