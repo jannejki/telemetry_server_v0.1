@@ -31,7 +31,35 @@
     </div>
     <main>
 
+        <div id="addNewChart">
+            <form method="get" action="/getHistory" class="optionsDiv" id="addNewChartOptions">
+
+                <div class="selectOptionsDiv">
+                    <label for="canDropDown" class="optionLabel">Select CAN:</label>
+                    <select name="can" id="canDropDown" class="optionInput">
+                    </select>
+                </div>
+
+                <div id=dateDiv class="selectOptionsDiv">
+                    <label for="date">select date:</label>
+                    <input type="date" id="date" name="date" required value="2022-01-20" class="optionInput">
+                </div>
+
+                <div id="hoursDiv" class="selectOptionsDiv">
+                    <label for="hourStart">select start time:</label><br>
+                    <input type="time" id="hourStart" name="hourStart" min="00:00" max="23:59" required value="13:33" class="optionInput">
+                    <label for="hourEnd">select ending time:</label><br>
+                    <input type="time" id="hourEnd" name="hourEnd" min="00:00" max="23:59" required value="00:00" class="optionInput">
+                </div>
+
+                <input type="submit" id="selectCANBtn" value="Create" class="optionInput">
+            </form>
+
+        </div>
+
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="javascript/chartSettings.js"></script>
     <script src="javascript/history.js"></script>
 </body>
 

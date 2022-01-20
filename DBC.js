@@ -252,7 +252,7 @@ exports.DbcParser = function() {
             let value = parseFloat(rule.offset) + parseFloat(rule.scale) * rawValue;
 
             // push calculated value to array
-            valueArray.push({ name: rule.name, value: value, unit: rule.unit, min: rule.min, max: rule.max })
+            valueArray.push({ canID: message.canID, name: rule.name, data: value, unit: rule.unit, min: rule.min, max: rule.max, time: message.timestamp })
         })
 
         return valueArray;
@@ -270,15 +270,16 @@ exports.DbcParser = function() {
 
         // Extract whole decoding rule of the wanted can ID
         try {
-            index1 = this.dbcFile.indexOf("BO_ " + canID);
+            index1 = this.dbcFile.indexOf("BO_ " + canID + " ");
 
             // throw error if there is no decoding rule found
             if (index1 === -1) throw "\nNo decoding rule found with can ID: " + canID;
-
             let split1 = this.dbcFile.slice(index1);
             index1 = split1.indexOf("\n\r");
+
             const decodingRule = split1.slice(0, (index1 - 1))
             let signals = decodingRule.split(" SG_ ");
+
 
             // extracting can name
             /* let canName = signals[0].split(" ");
@@ -320,7 +321,11 @@ exports.DbcParser = function() {
                 const max = splittedFromSpace[4].slice(index1 + 1, index2);
 
                 // extracting unit
-                const unit = splittedFromSpace[5];
+                let unit = splittedFromSpace[5];
+
+                while (unit.indexOf('"') !== -1) {
+                    unit = unit.replace('"', "");
+                }
 
                 // pushing values to json array
                 signalArray.push({

@@ -52,7 +52,7 @@ app.listen(port, () => {
     console.log("listening on port", port);
 });
 
-let latestMessage;
+//let latestMessage;
 //------------------------------------------------//
 //---------------AUTHENTICATION-------------------//
 initializePassport(
@@ -75,7 +75,6 @@ function checkAuthenticated(req, res, next) {
 }
 
 app.get("/login", (req, res) => {
-    console.log(dbcParser.calculateValue({ canID: 1317, data: "FFFFFF6813FFFFFF" }));
     res.render('login.ejs')
 })
 
@@ -136,9 +135,16 @@ app.get("/updateLive", checkAuthenticated, async(req, res) => {
     let latestMessages = [];
 
     for (let i in selectedCans) {
-        latestMessages.push(await getLatestData(selectedCans[i].can));
+        try {
+            let rawData = await getLatestData(selectedCans[i].can);
+            let physicalValue = dbcParser.calculateValue({ canID: rawData[0].canID, data: rawData[0].data, time: rawData[0].timestamp })
+            latestMessages.push(physicalValue);
+        } catch {
+            console.log("something went wrong");
+        }
     }
-
+    console.log(latestMessages);
+    //TODO: calculate fysical values from the raw data
     res.send({ data: latestMessages }).status(200);
 })
 
@@ -211,6 +217,29 @@ app.get("/changeDbcFile", async(req, res) => {
     }
 })
 
+app.get("/getHistory", async(req, res) => {
+    let canID = req.query.can;
+    let query = "select * from data where timestamp BETWEEN'" + req.query.startTime + "' AND '" + req.query.endTime + "' AND canID='" + canID + "';"
+    let calculatedValues = [];
+    try {
+        let getData = await db.raw(query);
+
+        if (getData.length === 0) {
+            res.sendStatus(404);
+            return;
+        }
+
+        getData.forEach((data) => {
+            calculatedValues.push(dbcParser.calculateValue(data));
+        })
+
+        res.send({ data: calculatedValues }).status(204);
+    } catch {
+        res.sendStatus(500);
+    }
+
+})
+
 //------------------------------------------------//
 //------------------MQTT--------------------------//
 
@@ -228,7 +257,7 @@ client.subscribe("messages");
 
 // receive MQTT messages
 client.on('message', async function(topic, message, packet) {
-    latestMessage = message.toString();
+    //  latestMessage = message.toString();
     try {
         saveData(message.toString());
     } catch {
@@ -325,16 +354,19 @@ async function getLatestData(CANID) {
 function getTime() {
     const today = new Date();
     let year = today.getFullYear();
-    let month = today.getMonth();
-    let day = today.getDay();
+    let month = today.getMonth() + 1;
+    let day = today.getDate();
     let hr = today.getHours();
     let min = today.getMinutes();
     let sec = today.getSeconds();
     let ms = today.getMilliseconds();
+    day = checkTime(day);
+    month = checkTime(month);
     min = checkTime(min);
     sec = checkTime(sec);
     ms = checkTime(ms);
-    let timestamp = day + "-" + month + "-" + year + " " + hr + ":" + min + ":" + sec + ":" + ms;
+
+    let timestamp = year + "-" + month + "-" + day + " " + hr + ":" + min + ":" + sec + "." + ms;
     return timestamp;
 }
 

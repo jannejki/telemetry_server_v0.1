@@ -2,7 +2,7 @@
  * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
  * @type {number}
  */
-let interval = 100; // updating charts time in milliseconds
+let interval = 10; // updating charts time in milliseconds
 /**
  * @desc global variable where latest received message is saved.
  * @type {JSON}
@@ -29,7 +29,7 @@ function ServerInterface() {
     this.idArray = { "canID": [] },
         this.interval = undefined,
         this.latestMessage = undefined,
-        this.intervaltime = 100,
+        this.intervaltime = interval,
 
         // Adds new canID to a array that is sent to server to ask the latest messages from the
         // can ids that are in array. 
@@ -77,14 +77,17 @@ function ServerInterface() {
                     if (this.latestMessage.data[i][0].canID === canID) {
                         return this.latestMessage.data[i][0];
                     }
-                    return {
-                        "ID": undefined,
-                        "canID": canID,
-                        "data": "0",
-                        "timestamp": undefined,
-                        "DLC": undefined
-                    }
                 }
+
+                console.warn("can't find data with ID:", canID);
+                return {
+                    "ID": undefined,
+                    "canID": canID,
+                    "data": "0",
+                    "timestamp": undefined,
+                    "DLC": undefined
+                }
+
             } catch (error) {
                 console.warn(error);
                 return {
@@ -124,7 +127,6 @@ window.onload = () => {
 function addChart() {
     let select = document.getElementById("canDropDown");
     let selectedCAN = select.value;
-    let selectedName = select.options[select.selectedIndex].text;
     let chart;
     let ticks = 1;
     serverInterface.addNewId(selectedCAN);
@@ -133,7 +135,7 @@ function addChart() {
     let chartSettings = new ChartSettings();
     let chartData = chartSettings.data;
     let chartOptions = chartSettings.options;
-    chartData.datasets[0].label = selectedName;
+    //chartData.datasets[0].label = selectedName;
 
     createChartElements(selectedCAN);
 
@@ -171,6 +173,20 @@ function addChart() {
             data: chartData
         });
 
+        let dataset = {
+            spanGaps: true,
+            label: "",
+            backgroundColor: "rgba(255,99,132,0.2)",
+            borderColor: "rgba(255,99,132,1)",
+            borderWidth: 2,
+            hoverBackgroundColor: "rgba(255,99,132,0.4)",
+            hoverBorderColor: "rgba(255,99,132,1)",
+            data: []
+        }
+
+        chart.data.datasets.push(dataset);
+
+
 
         // Calculating X-axis labels and pushing them to chart
         let labelAmount = (selectedTime * 1000) / interval;
@@ -186,8 +202,12 @@ function addChart() {
         }
 
         // Starting an interval that will update the chart with new data.
+        let tries = 0;
         let chartUpdateInterval = setInterval(() => {
             let latestMessage = serverInterface.getLatestMessages(selectedCAN);
+            tries++;
+            if (latestMessage.id === undefined && tries < 10) return;
+
             try {
                 updateChart(latestMessage, chart, ticks, labelAmount, oneSec);
             } catch (error) {
@@ -198,6 +218,7 @@ function addChart() {
             ticks++;
         }, interval);
 
+
     });
 }
 
@@ -207,6 +228,9 @@ function addChart() {
  * @param selectedCAN {string} name of the selected CAN
  */
 function createChartElements(selectedCAN) {
+    let select = document.getElementById("canDropDown");
+    let selectedName = select.options[select.selectedIndex].text;
+
     // Creating Div element where all other elements will be created
     const dataDiv = document.createElement("div");
     dataDiv.setAttribute("id", document.getElementById("canDropDown").value);
@@ -216,6 +240,10 @@ function createChartElements(selectedCAN) {
     const chartContainer = document.createElement("div");
     chartContainer.setAttribute("class", "chart");
 
+    const chartHeader = document.createElement("h3");
+    chartHeader.innerHTML = selectedName;
+
+    chartContainer.appendChild(chartHeader);
     // Creating canvas where the chart will appear
     const canvas = document.createElement("canvas");
     canvas.setAttribute("id", selectedCAN);
@@ -363,6 +391,7 @@ function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
     let lowestValue = optionsDiv[2];
     let label = ticks / oneSec;
     let value = parseFloat(latestMessage.data).toFixed(2);
+    chart.data.datasets[0].label = latestMessage.name;
 
     if (ticks >= startTime) {
         if ((label % 1 === 0)) {
@@ -380,13 +409,16 @@ function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
         }
     });
 
-    if (value > highestValue.innerHTML) {
+    if (parseInt(value) > parseInt(highestValue.innerHTML)) {
+        chart.options.scales.y.max = parseInt(value) + 2;
         highestValue.innerHTML = value;
     }
+
     if (value < lowestValue.innerHTML) {
         lowestValue.innerHTML = value;
     }
-    currentValue.innerHTML = value;
+
+    currentValue.innerHTML = value + " " + latestMessage.unit;
 
     chart.update();
 }

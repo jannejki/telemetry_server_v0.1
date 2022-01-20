@@ -1,3 +1,118 @@
 html {
-    background-color:#585b5d;
+    background-color: #585b5d
+}
+
+#addNewChart {
+    background-color: white;
+    width: auto;
+    min-width: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1em;
+    border-style: solid;
+    border-color: black;
+    border-radius: 5px;
+}
+
+#addNewChartOptions {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.chartDiv {
+    width: auto;
+    height: auto;
+    display: flex;
+    margin: 1em;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 5px 5px 5px 5px #46484A;
+}
+
+.chart {
+    position: relative;
+    width: 90%;
+    height: auto;
+    margin: 0;
+    text-align: center;
+}
+
+.optionsDiv {
+    width: 10%;
+    min-width: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    border-style: solid;
+    border-width: 2px;
+    border-color: darkgrey;
+    border-radius: inherit;
+    padding: 0.5em;
+    text-align: center;
+}
+
+.selectOptionsDiv {
+    width: 100%;
+    margin: auto;
+}
+
+.optionInput {
+    margin: auto;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+#selectCANBtn {
+    height: 10%;
+}
+
+.optionButton {
+    margin: auto!important;
+}
+
+.labelDiv {
+    width: 100%;
+    text-align: center;
+}
+
+.optionLabel {
+    margin: auto;
+}
+
+.timeDropDown {
+    margin: auto;
+}
+
+.selectTimeButton {
+    margin: auto;
+    width: 75%;
+}
+
+.removeButtonDiv {
+    width: 100%;
+    height: 5%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.deleteChartButton {
+    margin: 0 0 auto auto;
+    width: 100%;
+    height: 100%;
+}
+
+.infoDiv {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.numberValues {
+    margin: auto;
+    border-style: none;
+    font-weight: bolder;
+}
+
+.numberValuesLabel {
+    margin: auto;
 }
