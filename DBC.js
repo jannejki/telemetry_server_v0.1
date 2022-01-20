@@ -17,13 +17,13 @@ exports.DbcParser = function() {
             }
             this.dbcFile = data;
             this.dbcFileName = dbcFile;
-            console.log("dbcFile loaded!");
+            console.log("dbcFile loaded: ", dbcFile);
         });
     }
 
+    // get Can names from the active .dbc file
     this.getCanNames = () => {
         let decodingRules = this.dbcFile.split("\nBO_ ");
-        let test;
         decodingRules.splice(0, 1);
 
         for (let i = 0; i < decodingRules.length; i++) {
@@ -35,7 +35,6 @@ exports.DbcParser = function() {
                 decodingRules.splice(i, 1);
             }
         }
-
 
         let names = [];
 
@@ -199,59 +198,64 @@ exports.DbcParser = function() {
 
     /**
      * @brief calculates can data to decimal value
-     * @param {json} message contains canID and data
+     * @param {json} message { canID: canid, data: data }
      * @returns {json} { name, value, unit, min, max }
      */
     this.calculateValue = (message) => {
         const rules = this.getDecodingRules(message.canID);
+        let valueArray = [];
 
-        if (rules.error !== null) return rules;
+        // for each signal rule, calculate value
+        rules.forEach(rule => {
+            let startBit = parseInt(rule.startBit);
+            let length = parseInt(rule.length);
 
-        let startBit = parseInt(rules.startBit);
-        let length = parseInt(rules.length);
+            // extract wanted bits from the message
+            let binaryMessage = this.hexToBin(message.data)
+            binaryMessage = binaryMessage.slice(startBit, (startBit + length));
 
-        // extract wanted bits from the message
-        let binaryMessage = this.hexToBin(message.data)
-        binaryMessage = binaryMessage.slice(startBit, (startBit + length));
+            // create byte array 
+            let binaryArray = binaryMessage.split("");
+            let byteArray = [];
 
-        // create byte array 
-        let binaryArray = binaryMessage.split("");
-        let byteArray = [];
+            while (binaryArray.length > 0) {
+                let byte = [];
 
-        while (binaryArray.length > 0) {
-            let byte = [];
+                for (let i = 0; i < 8; i++) {
+                    if (binaryArray[0] === undefined) {
+                        byte[i] = 0;
+                    } else {
+                        byte[i] = binaryArray[0];
+                        binaryArray.shift();
+                    }
+                }
+                byteArray.push(byte);
+            }
 
-            for (let i = 0; i < 8; i++) {
-                if (binaryArray[0] === undefined) {
-                    byte[i] = 0;
-                } else {
-                    byte[i] = binaryArray[0];
-                    binaryArray.shift();
+            // reverse bytes if message is little endian
+            if (rule.endian == 1) {
+                byteArray.reverse();
+            }
+
+            // create binaryString from the bytes
+            let readyBinaryString = "";
+            for (byte in byteArray) {
+                for (bit in byteArray[byte]) {
+                    readyBinaryString = readyBinaryString + byteArray[byte][bit].toString();
                 }
             }
-            byteArray.push(byte);
-        }
 
-        // reverse bytes if message is little endian
-        if (rules.endian == 1) {
-            byteArray.reverse();
-        }
+            // turn binary string to decimal value
+            let rawValue = this.binToDec(readyBinaryString);
 
-        // create binaryString from the bytes
-        let readyBinaryString = "";
-        for (byte in byteArray) {
-            for (bit in byteArray[byte]) {
-                readyBinaryString = readyBinaryString + byteArray[byte][bit].toString();
-            }
-        }
+            //calculate real physical value
+            let value = parseFloat(rule.offset) + parseFloat(rule.scale) * rawValue;
 
-        // turn binary string to decimal value
-        let rawValue = this.binToDec(readyBinaryString);
+            // push calculated value to array
+            valueArray.push({ name: rule.name, value: value, unit: rule.unit, min: rule.min, max: rule.max })
+        })
 
-        //calculate real physical value
-        let value = parseFloat(rules.offset) + parseFloat(rules.scale) * rawValue;
-
-        return { name: rules.name, value: value, unit: rules.unit, min: rules.min, max: rules.max };
+        return valueArray;
     }
 
     /**
@@ -262,6 +266,7 @@ exports.DbcParser = function() {
      */
     this.getDecodingRules = (canID) => {
         let index1, index2;
+        let signalArray = [];
 
         // Extract whole decoding rule of the wanted can ID
         try {
@@ -271,80 +276,73 @@ exports.DbcParser = function() {
             if (index1 === -1) throw "\nNo decoding rule found with can ID: " + canID;
 
             let split1 = this.dbcFile.slice(index1);
-
             index1 = split1.indexOf("\n\r");
             const decodingRule = split1.slice(0, (index1 - 1))
+            let signals = decodingRule.split(" SG_ ");
 
-            // Extract message name
-            index1 = decodingRule.indexOf("SG_ ");
+            // extracting can name
+            /* let canName = signals[0].split(" ");
+             canName = signals[0].split(" ");
+             canName = canName[2].slice(0, -1);*/
 
-            //throw error if there is no signal syntax
-            if (index1 === -1) throw "\nNo signal syntax for can ID: " + canID;
+            signals.shift();
 
-            index2 = decodingRule.indexOf(" : ");
+            // throw error if there are no signals for can ID
+            if (signals.length === 0) throw "\nNo signal syntax for can ID: " + canID;
 
-            const messageName = decodingRule.slice(index1 + 4, index2);
+            // extract values for every signal
+            signals.forEach(signal => {
+                let splittedFromSpace = signal.split(" ");
 
-            // Extract start bit
-            let bitStartLength = decodingRule.slice(index2 + 3)
-            index1 = bitStartLength.indexOf(" ");
+                // extracting signal name
+                const signalName = splittedFromSpace[0];
 
-            bitStartLength = bitStartLength.slice(0, index1);
-            index1 = bitStartLength.indexOf("|");
-            const bitStart = bitStartLength.slice(0, index1);
+                //extracting bitStart, length and endian
+                index1 = splittedFromSpace[2].indexOf("|");
+                index2 = splittedFromSpace[2].indexOf("@");
 
-            // Extract bit length and endian
-            index2 = bitStartLength.indexOf("@");
+                const bitStart = splittedFromSpace[2].slice(0, index1);
+                const bitLength = splittedFromSpace[2].slice(index1 + 1, index2);
+                const endian = splittedFromSpace[2].slice(index2 + 1);
 
-            const bitLength = bitStartLength.slice(index1 + 1, index2);
-            const endian = bitStartLength.slice(index2 + 1, bitStartLength.length - 1);
+                // extracting scale and offset
+                index1 = splittedFromSpace[3].indexOf(",");
+                index2 = splittedFromSpace[3].indexOf(")");
 
-            // Extract scale and offset
-            index1 = decodingRule.indexOf(" (");
-            index2 = decodingRule.indexOf(") ");
+                const scale = splittedFromSpace[3].slice(1, index1);
+                const offset = splittedFromSpace[3].slice(index1 + 1, index2);
 
-            let scaleOffset = decodingRule.slice(index1 + 2, index2);
-            index1 = scaleOffset.indexOf(",");
+                // extracting min and max
+                index1 = splittedFromSpace[4].indexOf("|");
+                index2 = splittedFromSpace[4].indexOf("]");
 
-            const scale = scaleOffset.slice(0, index1);
-            const offset = scaleOffset.slice(index1 + 1);
+                const min = splittedFromSpace[4].slice(1, index1);
+                const max = splittedFromSpace[4].slice(index1 + 1, index2);
 
-            // Extract min and max values
-            index1 = decodingRule.indexOf(" [");
-            index2 = decodingRule.indexOf("] ");
+                // extracting unit
+                const unit = splittedFromSpace[5];
 
-            let minMax = decodingRule.slice(index1 + 2, index2);
-            index1 = minMax.indexOf("|");
+                // pushing values to json array
+                signalArray.push({
+                    name: signalName,
+                    startBit: bitStart,
+                    length: bitLength,
+                    endian: endian,
+                    scale: scale,
+                    offset: offset,
+                    min: min,
+                    max: max,
+                    unit: unit
+                })
+            })
 
-            const min = minMax.slice(0, index1);
-            const max = minMax.slice(index1 + 1);
-
-            // Extract unit
-            index1 = decodingRule.indexOf('] "');
-            let tempUnit = decodingRule.slice(index1 + 3);
-            index1 = tempUnit.indexOf('"');
-
-            const unit = tempUnit.slice(0, index1);
-
-            return {
-                name: messageName,
-                startBit: bitStart,
-                length: bitLength,
-                endian: endian,
-                scale: scale,
-                offset: offset,
-                min: min,
-                max: max,
-                unit: unit
-            };
+            return signalArray;
 
         } catch (error) {
             console.log(error);
 
-            return {
-                error: error,
-                value: undefined
-            }
+            // if something went wrong, return this
+            return { error: error, value: undefined }
         }
 
     }

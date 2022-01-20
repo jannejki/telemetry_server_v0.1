@@ -75,6 +75,7 @@ function checkAuthenticated(req, res, next) {
 }
 
 app.get("/login", (req, res) => {
+    console.log(dbcParser.calculateValue({ canID: 1317, data: "FFFFFF6813FFFFFF" }));
     res.render('login.ejs')
 })
 
@@ -143,8 +144,6 @@ app.get("/updateLive", checkAuthenticated, async(req, res) => {
 
 app.get("/loadCans", checkAuthenticated, async(req, res) => {
     let canList = dbcParser.getCanNames();
-    console.log(canList);
-
     res.send({ canList: canList }).status(204);
 })
 
@@ -203,7 +202,6 @@ app.get("/downloadDbcFile", (req, res) => {
 
 app.get("/changeDbcFile", async(req, res) => {
     const fileName = req.query.filename;
-    console.log(fileName);
     try {
         dbcParser.loadDbcFile(fileName);
         await db("activeSettings").where({ name: "dbcFile" }).update({ status: fileName });
@@ -259,7 +257,6 @@ async function loadDbc() {
 }
 loadDbc();
 
-//TODO: save data
 /**
  * @function saveData
  * @desc save received message to database
@@ -289,7 +286,6 @@ async function saveData(data) {
 }
 
 //TODO: retrieve data
-//TODO: rename function
 function getData() {
     let data = db.select().from("canID");
     return data;
@@ -300,6 +296,7 @@ function getData() {
  * @function newCAN
  * @desc saves new canID to database
  * @param canInfo {JSON} data that contains canID and can name {"canID": 'xxx', "canName":'yyy'}
+ * @deprecated 20.1.2022 No need for this because you can load CAN names and IDs from .dbc files
  */
 
 async function newCAN(canInfo) {
@@ -341,9 +338,10 @@ function getTime() {
     return timestamp;
 }
 
+// add zero in front of numbers < 10
 function checkTime(i) {
     if (i < 10) {
         i = "0" + i
-    }; // add zero in front of numbers < 10
+    };
     return i;
 }
