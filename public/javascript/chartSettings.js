@@ -10,6 +10,8 @@ function ChartSettings() {
     };
 
     this.options = {
+        responsive: true,
+        maintainAspectRatio: false,
         animation: false,
         lineTension: 0.4,
         elements: {

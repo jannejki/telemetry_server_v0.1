@@ -11,15 +11,12 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const fs = require('fs');
 const DBCParser = require('./DBC.js');
-
 const dbcParser = new DBCParser.DbcParser("CAN0.dbc");
-
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 const initializePassport = require('./passport-config')
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'database/dbcFiles');
@@ -29,8 +26,8 @@ const storage = multer.diskStorage({
         cb(null, originalname);
     }
 })
-
 const upload = multer({ storage })
+
 
 app.use(flash())
 app.use(session({
@@ -40,21 +37,28 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
-
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
 
+
+const server = require('http').createServer(app);
+const WebSocket = require('ws');
 const port = 3000;
-app.listen(port, () => {
+server.listen(port, () => {
     console.log("listening on port", port);
 });
 
-//let latestMessage;
+
+
+
 //------------------------------------------------//
 //---------------AUTHENTICATION-------------------//
+/**
+ * @brief initializing passport
+ */
 initializePassport(
     passport,
     async name => {
@@ -67,6 +71,13 @@ initializePassport(
     }
 )
 
+/**
+ * @brief middleware to check if user is authenticated. If not, redirecting to /login
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns next() if authenticated, otherwise redirects to /login
+ */
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -74,17 +85,27 @@ function checkAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
+/**
+ * @brief sends login.ejs file to user to log in
+ */
 app.get("/login", (req, res) => {
     res.render('login.ejs')
 })
 
+/** 
+ * Checks if inserted username and passport are correct. If success, redirects to "/", else "/login"
+ * @brief Checks if username and passport is correct.
+ */
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
 }))
 
-app.post('/logout', (req, res) => {
+/**
+ * @brief logs user out.
+ */
+app.get('/logout', (req, res) => {
     console.log("logout");
     req.logOut();
     res.redirect('/');
@@ -92,81 +113,84 @@ app.post('/logout', (req, res) => {
 
 //------------------------------------------------//
 //---------------ROUTES---------------------------//
-app.get('/', checkAuthenticated, (req, res) => {
-    // Send a landing page
+app.get('/testi', checkAuthenticated, async(req, res) => {
+    wss.clients.forEach(function each(client) {
+        let message = JSON.stringify({ isCarOnline: true })
+        client.send(message);
+    });
+    res.sendStatus(204);
+});
+/**
+ * @brief sends index page to user
+ */
+app.get('/', checkAuthenticated, async(req, res) => {
     res.sendFile(path.join(__dirname, '/views/index.html'));
 });
 
+/**
+ * @brief sends livepage to user
+ */
 app.get('/live', checkAuthenticated, async(req, res) => {
-    //TODO: send live data
-    console.log("live");
     res.sendFile(path.join(__dirname, '/views/live.html'));
 })
 
-app.get('/history', checkAuthenticated, (req, res) => {
-    //TODO: send history data
-    console.log("history");
+/**
+ * @brief sends historypage to user
+ */
+app.get('/history', checkAuthenticated, async(req, res) => {
     res.sendFile(path.join(__dirname, '/views/history.html'));
 })
 
-app.get('/settings', checkAuthenticated, (req, res) => {
-    //TODO: save new can ID to database
-    console.log("settings");
+/**
+ * @brief sends settingspage to user 
+ */
+app.get('/settings', checkAuthenticated, async(req, res) => {
     res.sendFile(path.join(__dirname, '/views/settings.html'));
+
 })
 
-app.post("/selectLiveCan", checkAuthenticated, (req, res) => {
-    console.log('Got body:', req.body);
-    selectedCAN = req.body.CAN;
-    res.sendStatus(204);
-})
+/**
 
-app.post("/newCAN", checkAuthenticated, async(req, res) => {
-    try {
-        await db("canID").insert(req.body);
-        res.sendStatus(201);
-    } catch (error) {
-        res.sendStatus(500);
-    }
-})
-
+ * @brief gets the latest data values from database, converts it to physical value and sends it to user.
+ */
 app.get("/updateLive", checkAuthenticated, async(req, res) => {
     let selectedCans = JSON.parse(req.query.can);
     let latestMessages = [];
 
+    // for every can ID in request query, loads the latest data from database, uses dbcParser to calculate physical value,
+    // and pushes it to array
     for (let i in selectedCans) {
         try {
             let rawData = await getLatestData(selectedCans[i].can);
             let physicalValue = dbcParser.calculateValue({ canID: rawData[0].canID, data: rawData[0].data, time: rawData[0].timestamp })
+
             latestMessages.push(physicalValue);
         } catch {
             console.log("something went wrong");
         }
     }
-    console.log(latestMessages);
-    //TODO: calculate fysical values from the raw data
+    // sends array containing all the physical values to client
     res.send({ data: latestMessages }).status(200);
 })
 
+/**
+ * @brief loads can IDs and names from the dbc file and sends it to user
+ */
 app.get("/loadCans", checkAuthenticated, async(req, res) => {
     let canList = dbcParser.getCanNames();
     res.send({ canList: canList }).status(204);
 })
 
-app.delete("/deleteCan", checkAuthenticated, async(req, res) => {
-    console.log(req.body);
-    try {
-        await db("canID").where(req.body).del();
-        res.sendStatus(204);
-    } catch (error) {
-        res.sendStatus(500);
-    }
-})
-
+/**
+ * @brief saves the user uploaded dbc file to database
+ */
 app.post("/uploadDBC", upload.single('dbcFile'), (req, res) => {
     return res.json({ status: 'saved' })
 })
 
+/**
+ * @brief gets names of the dbc files that are in database/dbcFiles folder and sends array to user
+ */
 app.get("/loadDbcFiles", async(req, res) => {
     await fs.readdir(path.join(__dirname, 'database/dbcFiles'), function(err, files) {
         let fileArray = [];
@@ -183,6 +207,9 @@ app.get("/loadDbcFiles", async(req, res) => {
     });
 })
 
+/**
+ * @brief deletes dbc file from database
+ */
 app.delete("/deleteFile", (req, res) => {
     const path = './database/dbcFiles/' + req.body.filename;
 
@@ -195,6 +222,10 @@ app.delete("/deleteFile", (req, res) => {
     }
 });
 
+/**
+ * @brief sends the dbcfile to user
+ * FIXME: not working yet
+ */
 app.get("/downloadDbcFile", (req, res) => {
     const path = './database/dbcFiles/' + req.query.filename;
     fs.readFile(path, (err, data) => {
@@ -205,11 +236,17 @@ app.get("/downloadDbcFile", (req, res) => {
     })
 });
 
-
+/**
+ * @brief changes the dbc file to the one that user has selected
+ */
 app.get("/changeDbcFile", async(req, res) => {
     const fileName = req.query.filename;
     try {
+        // lets the dbcParser to load file to use
         dbcParser.loadDbcFile(fileName);
+
+        // changes from database the active file. This is for the server to know what was the last 
+        // file that was in use before restarting the server
         await db("activeSettings").where({ name: "dbcFile" }).update({ status: fileName });
         res.sendStatus(204);
     } catch (error) {
@@ -217,22 +254,30 @@ app.get("/changeDbcFile", async(req, res) => {
     }
 })
 
+/**
+ * @brief gets history data from database
+ */
 app.get("/getHistory", async(req, res) => {
+    // Creating query to use to get the correct data from database
     let canID = req.query.can;
     let query = "select * from data where timestamp BETWEEN'" + req.query.startTime + "' AND '" + req.query.endTime + "' AND canID='" + canID + "';"
     let calculatedValues = [];
+
     try {
         let getData = await db.raw(query);
 
+        // if there was no data between that time and for the can ID, send status 404
         if (getData.length === 0) {
             res.sendStatus(404);
             return;
         }
 
+        // for each data, calculate physical value of it and save to new array
         getData.forEach((data) => {
             calculatedValues.push(dbcParser.calculateValue(data));
         })
 
+        // send calculated values to client
         res.send({ data: calculatedValues }).status(204);
     } catch {
         res.sendStatus(500);
@@ -241,11 +286,34 @@ app.get("/getHistory", async(req, res) => {
 })
 
 //------------------------------------------------//
-//------------------MQTT--------------------------//
+//----------------Web Socket----------------------//
+const wss = new WebSocket.Server({ server: server });
 
+wss.on('connection', async function connection(ws) {
+    console.log('A new Websocket- client Connected!');
+    let isCarOnline = await checkIfCarIsOnline();
+    let sendMessage = JSON.stringify({ carStatus: isCarOnline })
+    ws.send(sendMessage);
+});
+
+function sendLiveData(rawData) {
+    let dataArray = [];
+    for (let i in rawData) {
+        dataArray.push(dbcParser.calculateValue(rawData[i]));
+    }
+
+    wss.clients.forEach(function each(client) {
+        let message = JSON.stringify({ carStatus: true, latestMessage: dataArray })
+        client.send(message);
+    });
+}
+
+
+//------------------------------------------------//
+//------------------MQTT--------------------------//
 // create MQTT OBJECT
-const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
-//const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "pc" });
+//const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
+const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "asd" });
 
 // connecting to mqtt broker
 client.on("connect", function() {
@@ -257,11 +325,14 @@ client.subscribe("messages");
 
 // receive MQTT messages
 client.on('message', async function(topic, message, packet) {
-    //  latestMessage = message.toString();
     try {
-        saveData(message.toString());
-    } catch {
+        let rawData = parseData(message.toString());
+        sendLiveData(rawData);
+        // saveData(message.toString());
+        saveData(rawData);
+    } catch (error) {
         console.log("message is corrupted!");
+        console.log(error);
     }
 });
 
@@ -278,7 +349,7 @@ const db = require('knex')({
 
 
 /**
- * changing dbc file to the one that was selected before shutting down
+ * @brief changing dbc file to the one that was selected before shutting down
  */
 async function loadDbc() {
     let dbcFile = await db("activeSettings").where({ name: "dbcFile" });
@@ -287,60 +358,31 @@ async function loadDbc() {
 loadDbc();
 
 /**
- * @function saveData
- * @desc save received message to database
- * @param data {JSON}  data to save {"canID":xxx, "message":yyy}
- * @property canID {} canID where the message came from
- * @property message {} the message itself
- * @property timestamp {} timestamp when the message was received
- * @property {integer} session number of the session. Check from database what is the last session number and increment it by 1.
+ * @brief save received message to database
+ * @param data {{canID: text, data: text, DLC:text, timestamp:text}}
+ * @returns nothing
  */
 async function saveData(data) {
-    let timestamp = getTime();
-    let dataArray = data.split(":");
-
-    while (dataArray.length > 0) {
+    for (let i in data) {
         try {
             await db('data').insert({
-                canID: dataArray[0],
-                data: dataArray[2],
-                DLC: dataArray[1],
-                timestamp: timestamp,
-            }).into("data");
-            dataArray.splice(0, 3);
+                canID: data[i].canID,
+                data: data[i].data,
+                DLC: data[i].DLC,
+                timestamp: data[i].timestamp
+            });
         } catch (error) {
-            console.log("can't save data: ", error);
+            console.log("Can't save data!");
+            console.log(error);
         }
     }
 }
 
-//TODO: retrieve data
-function getData() {
-    let data = db.select().from("canID");
-    return data;
-}
-
-//TODO: saved data: canIDs with names, [canID, data, timestamp, session nr], users
 /**
- * @function newCAN
- * @desc saves new canID to database
- * @param canInfo {JSON} data that contains canID and can name {"canID": 'xxx', "canName":'yyy'}
- * @deprecated 20.1.2022 No need for this because you can load CAN names and IDs from .dbc files
+ * @brief gets the latest data from database 
+ * @param {string} CANID can ID what data you want
+ * @returns {array} the latest data from database [{ID, canID, data, timestamp, DLC}]
  */
-
-async function newCAN(canInfo) {
-    try {
-        await db('canID').insert({
-            CANID: canInfo.canID,
-            Name: canInfo.canName
-        }).into("canID");
-        return true;
-    } catch (error) {
-        console.log(error);
-        return false;
-    }
-}
-
 async function getLatestData(CANID) {
     return await db('data').where({
         canID: CANID
@@ -350,8 +392,12 @@ async function getLatestData(CANID) {
 
 //------------------------------------------------//
 //-----------------FUNCTIONS----------------------//
-//TODO: realtime clock with millisecond accuracy for saving timestamp
-function getTime() {
+/**
+ * @brief checks the current time and sends a timestamp of it
+ * @param {number} minuteOffset offset of minutes, if wanted timestamp x minutes before current time. Default value is 0.
+ * @returns {string} timestamp: "2022-01-24 9:41:12.567"
+ */
+function getTime(minuteOffset = 0) {
     const today = new Date();
     let year = today.getFullYear();
     let month = today.getMonth() + 1;
@@ -360,20 +406,78 @@ function getTime() {
     let min = today.getMinutes();
     let sec = today.getSeconds();
     let ms = today.getMilliseconds();
-    day = checkTime(day);
+
     month = checkTime(month);
-    min = checkTime(min);
+    day = checkTime(day);
+    hr = checkTime(hr);
     sec = checkTime(sec);
     ms = checkTime(ms);
+
+    min = parseInt(min) + parseInt(minuteOffset);
+    min = checkTime(min);
 
     let timestamp = year + "-" + month + "-" + day + " " + hr + ":" + min + ":" + sec + "." + ms;
     return timestamp;
 }
 
-// add zero in front of numbers < 10
+/**
+ * @brief checks if number is under 10, then adds 0 in front of it. 1 -> 01
+ * @param {number} i number to be checked
+ * @returns {string} same number as parameter but 0 in front if it is under 10
+ */
 function checkTime(i) {
     if (i < 10) {
         i = "0" + i
     };
     return i;
+}
+
+/**
+ * @brief parses raw data to a json format.
+ * @param {text} rawData raw data that was received from car
+ * @returns {{canID:text, data:text, DLC:text, timestamp:text}}
+ */
+function parseData(rawData) {
+    let timestamp = getTime();
+    let dataArray = rawData.split(":");
+    let parsedArray = [];
+
+    while (dataArray.length > 0) {
+        try {
+            parsedArray.push({
+                canID: dataArray[0],
+                data: dataArray[2],
+                DLC: dataArray[1],
+                timestamp: timestamp
+            });
+            dataArray.splice(0, 3);
+        } catch (error) {
+            console.log("can't parse data: ", error, dataArray[0]);
+            return;
+        }
+    }
+    return parsedArray;
+}
+
+/**
+ * @brief checks if the car has sent any messages in the past 5 minutes
+ * @returns  {boolean} true if there was new messages in the last 5 minutes, false if not
+ */
+async function checkIfCarIsOnline() {
+    // gets the current time -5 minutes
+    let timestamp = getTime(-1);
+
+    // creating query to check if there is any data after the timestamp
+    let query = "select * from data where timestamp >= '" + timestamp + "';";
+    try {
+
+        let data = await db.raw(query);
+
+        // if got any data from database, return true, else false
+        if (data.length > 0) return true;
+        return false;
+
+    } catch (error) {
+        return false;
+    }
 }

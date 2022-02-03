@@ -52,6 +52,10 @@ th {
     width: 25%;
 }
 
+.datatable th {
+    background-color: grey;
+}
+
 .activeFile {
     background-color: rgb(18, 212, 0)!important;
 }

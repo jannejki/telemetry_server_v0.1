@@ -9,29 +9,32 @@
 </head>
 
 <body>
-
     <div id="navbar">
-        <ul id="navList">
-            <form action="/logout?_method=DELETE" id="logoutForm" method="post">
-                <input type="submit" value="Log out" id="logoutButton">
-            </form>
-            <a href="/">
-                <li class="active">Home</li>
-            </a>
-            <a href="live">
-                <li class="">Live</li>
-            </a>
-            <a href="history">
-                <li class="">History</li>
-            </a>
-            <a href="settings">
-                <li class="">Settings</li>
-            </a>
-        </ul>
+        <img id="logo" src="images/logo.svg" />
+        <h1>Telemetry server</h1>
+        <div id="carStatus" class="">
+            <p></p>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Menu 
+          <i class="fa fa-caret-down"></i>
+        </button>
+            <div class="dropdown-content">
+                <a href="/">Home</a>
+                <a href="live">Live</a>
+                <a href="history">History</a>
+                <a href="settings">Settings</a>
+                <a href="/logout?_method=DELETE">Log out</a>
+            </div>
+        </div>
     </div>
     <main>
-
+        <form method="get" action="/testi">
+            <input type="submit" value="submit">
+        </form>
     </main>
+    <script src="javascript/navBar.js"></script>
     <script src="javascript/index.js"></script>
 </body>
 

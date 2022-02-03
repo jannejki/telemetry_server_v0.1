@@ -1,6 +1,7 @@
 var chart = [];
 
 window.onload = () => {
+    //checking current date and time to preset values for user inputs
     const today = new Date();
     let year = today.getFullYear();
     let month = today.getMonth() + 1;
@@ -17,6 +18,7 @@ window.onload = () => {
     document.getElementById("hourStart").value = hr - 1 + ":" + min;
     document.getElementById("hourEnd").value = hr + ":" + min;
 
+    // load CAN names and IDs from server to fill dropdown -list
     fetch('/loadCans')
         .then(response => response.json())
         .then((data) => {
@@ -29,6 +31,11 @@ window.onload = () => {
         })
 }
 
+/**
+ * @brief adds zero in front of parameter if it is less than 10.
+ * @param {number} i 
+ * @returns same number but if number
+ */
 function checkTime(i) {
     if (i < 10) {
         i = "0" + i
@@ -36,22 +43,28 @@ function checkTime(i) {
     return i;
 }
 
-
+/** 
+ * @brief event listener for addNewChartOptions form.
+ * @description sends request to get the data for selected CAN and time.
+ */
 document.forms['addNewChartOptions'].addEventListener('submit', (event) => {
+
+    // preveting default event
     event.preventDefault();
+
     let selectElement = document.getElementById("canDropDown");
     let canID = selectElement.value;
     let date = document.getElementById("date").value;
     let hourStart = document.getElementById("hourStart").value;
     let hourEnd = document.getElementById("hourEnd").value;
 
+    // parsing start- and endtimes to the right format for server
     let startTime2 = date + " " + hourStart;
     let endTime2 = date + " " + hourEnd;
 
-    // TODO do something here to show user that form is being submitted
+    // Sends GET request to server to get data 
     fetch("/getHistory?can=" + canID + "&startTime=" + startTime2 + "&endTime=" + endTime2)
         .then(response => {
-            console.log(response)
             switch (response.status) {
                 case 404:
                     alert("No data found!");
@@ -72,10 +85,13 @@ document.forms['addNewChartOptions'].addEventListener('submit', (event) => {
         })
 })
 
+/**
+ * @brief Creates new chart
+ * @param {json} data 
+ */
 function createChart(data) {
     let select = document.getElementById("canDropDown");
     let selectedCAN = select.value;
-
     let startTime = data.data[0][0].time;
     let endTime = data.data[data.data.length - 1][0].time;
 
@@ -99,11 +115,17 @@ function createChart(data) {
     fillDataset(data, chart[chart.length - 1]);
 }
 
-
+/**
+ * 
+ * @param {json} message data from the CAN in JSON array: [ {"canID", "name", "data", "unit", "min", "max", "time"}, {"canID", ...} ]
+ * @param {*} chart chart object where the data will be displayed
+ */
 function fillDataset(message, chart) {
+
     let max = 0;
     let min = message.data[0][0].data;
 
+    // dataset object where the data will be saved
     dataset = {
         spanGaps: true,
         label: "",
@@ -114,13 +136,28 @@ function fillDataset(message, chart) {
         hoverBorderColor: "rgba(255,99,132,1)",
         data: []
     }
+
+    // looping through the message array to fill the labels and datasets
     for (let i = 0; i < message.data.length; i++) {
         let index = message.data[i][0].time.indexOf(" ");
         let index2 = message.data[i][0].time.length - 4;
         let minutes = message.data[i][0].time.slice(index, index2);
-        chart.data.labels.push(minutes);
+
+        // filling labels
+        if (message.data.length < 100) {
+            chart.data.labels.push(minutes);
+        } else if (message.data.length > 100 && message.data.length < 500 && (i % 10) === 0) {
+            chart.data.labels.push(minutes);
+        } else if ((i % 100) === 0) {
+            chart.data.labels.push(minutes);
+        } else {
+            chart.data.labels.push("");
+        }
+
+        // filling dataset with the actual data value
         dataset.data.push(message.data[i][0].data);
 
+        // fixing the Y-axis to show only the data
         if (message.data[i][0].data > max) {
             max = message.data[i][0].data;
         }
@@ -130,19 +167,27 @@ function fillDataset(message, chart) {
         }
 
     }
+
+    // setting chart options 
     chart.options.lineTension = 0;
     chart.options.scales.y.max = max + 2;
     chart.options.scales.y.min = min - 2;
     chart.options.elements.point.radius = 3;
 
+    // creating chart label to show what is the name and unit of the data
     dataset.label = message.data[0][0].name + " (" + message.data[0][0].unit + ")";
 
+    // pushing data to charts dataset and updating the chart
     chart.data.datasets.push(dataset);
     chart.update();
 }
 
+
+/**
+ * @brief creating chart elements and appending them to html file
+ * @param {*} selectedCAN canID of the selected can
+ */
 function createChartElements(selectedCAN) {
-    let select = document.getElementById("canDropDown");
 
     // Creating Div element where all other elements will be created
     const dataDiv = document.createElement("div");
@@ -163,21 +208,24 @@ function createChartElements(selectedCAN) {
     const optionsDiv = document.createElement("div");
     optionsDiv.setAttribute("class", "optionsDiv " + selectedCAN);
 
+    // creating delete -button for deleting chart
     const deleteChartBtn = document.createElement("input");
     deleteChartBtn.setAttribute("value", "delete chart");
     deleteChartBtn.setAttribute("type", "button");
     deleteChartBtn.setAttribute("class", "optionButton");
-
     deleteChartBtn.setAttribute("onClick", "deleteChart('" + selectedCAN + "');");
 
-    optionsDiv.appendChild(deleteChartBtn);
-
     // Appending elements to html page
+    optionsDiv.appendChild(deleteChartBtn);
     dataDiv.appendChild(chartContainer);
     dataDiv.appendChild(optionsDiv);
     document.querySelector("main").insertBefore(dataDiv, document.getElementById("addNewChart"));
 }
 
+/**
+ * @brief deletes chart from the html file
+ * @param {number} id of the chart that will be deleted
+ */
 function deleteChart(chart) {
     document.getElementById(chart).remove();
 }
@@ -236,7 +284,6 @@ function createOptionElements(selectedCAN) {
     highestLabel.setAttribute("class", "numberValuesLabel");
     highestLabel.innerHTML = "Highest: ";
 
-
     // creating div and elements for lowest value
     const lowestDiv = document.createElement("div");
     lowestDiv.setAttribute("class", "infoDiv " + selectedCAN);
@@ -251,6 +298,7 @@ function createOptionElements(selectedCAN) {
     lowestValue.setAttribute("class", "numberValues" + selectedCAN + " numberValues");
     lowestValue.innerHTML = "99";
 
+    // appending all elements to html file
     highestDiv.appendChild(highestLabel);
     highestDiv.appendChild(highestValue);
     currentDiv.appendChild(currentLabel);

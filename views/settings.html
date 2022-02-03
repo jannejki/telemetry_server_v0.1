@@ -11,40 +11,28 @@
 <body>
 
     <div id="navbar">
-        <ul id="navList">
-            <form action="/logout?_method=DELETE" id="logoutForm" method="post">
-                <input type="submit" value="Log out" id="logoutButton">
-            </form>
-            <a href="/">
-                <li class="">Home</li>
-            </a>
-            <a href="live">
-                <li class="">Live</li>
-            </a>
-            <a href="history">
-                <li class="">History</li>
-            </a>
-            <a href="settings">
-                <li class="active">Settings</li>
-            </a>
-        </ul>
+        <img id="logo" src="images/logo.svg" />
+        <h1>Telemetry server</h1>
+        <div id="carStatus" class="">
+            <p></p>
+        </div>
+        <div class="dropdown">
+            <button class="dropbtn">Menu 
+          <i class="fa fa-caret-down"></i>
+        </button>
+            <div class="dropdown-content">
+                <a href="/">Home</a>
+                <a href="live">Live</a>
+                <a href="history">History</a>
+                <a href="settings">Settings</a>
+                <a href="logout?_method=DELETE">Log out</a>
+            </div>
+        </div>
     </div>
 
     <main>
         <div id="formDiv">
-            <!-- is this useless? 19.1.2022-->
-            <!-- <form action="/newCAN" method="POST" id="newCanForm" class="settingsForm">
-                <div class="row">
-                    <label for="canID">New canID:</label><br>
-                    <input type="text" name="CANID" id="canID" class="textInput">
-                </div>
-                <div class="row">
-                    <label for="canName">canID name:</label>
-                    <input type="text" name="Name" id="canName" class="textInput">
-                </div>
-                <input type="submit">
-            </form>
-        -->
+
             <form action="/uploadDBC" method="POST" enctype="multipart/form-data" id="newDBCFileForm" class="settingsForm">
                 <div class="row">
                     <label for="canID">Upload file:</label><br>
@@ -63,14 +51,13 @@
         <!-- is this useless? 19.1.2022 -->
         <table id="canTable" class="dataTable">
             <tr>
-                <th>ID</th>
-                <th>NAME</th>
-                <th>DELETE</th>
+                <th>Id</th>
+                <th>Name</th>
             </tr>
         </table>
         -
     </main>
-
+    <script src="javascript/navBar.js"></script>
     <script src="javascript/settings.js"></script>
 </body>
 

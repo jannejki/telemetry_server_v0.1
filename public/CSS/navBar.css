@@ -1,21 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Mohave:wght@700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Mohave:wght@700&family=Rubik&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mohave:wght@700&family=Montserrat:wght@100&family=Rubik&display=swap');
 html {
-    font-family: 'Rubik', sans-serif;
+    font-family: 'Montserrat', sans-serif;
+    color: black!important;
+    font-weight: bold;
     height: 100%;
 }
 
 main {
     margin: auto!important;
-    margin-top: 0!important;
+    margin-top: 3em!important;
     width: 100%!important;
-    padding: 1em!important;
+    padding: 2em!important;
 }
 
 body {
     display: flex!important;
     margin: 0!important;
     height: 100%!important;
+}
+
+#logo {
+    height: 2em;
 }
 
 
@@ -25,63 +30,129 @@ body {
 /*--------------NAV BAR------------------*/
 
 #navbar {
+    font-family: 'Montserrat', sans-serif!important;
+    display: flex;
+    flex-wrap: wrap;
     font-size: 25px;
     font-family: 'Rubik', sans-serif;
-    height: 100%;
-    width: auto;
-    position: static;
+    height: 2.5em;
+    width: 100%;
+    position: fixed;
     left: 0;
     top: 0;
     margin: auto;
-    background: #46494C;
+    background: #000000;
+    z-index: 1;
 }
 
-#navList {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 0;
-}
-
-li {
+#navbar h1 {
+    font-family: 'Montserrat', sans-serif;
     text-align: center;
-    margin-bottom: 2px;
-    padding: 1em;
-    background-color: #4C5C68;
-    height: 10%;
-}
-
-li:hover:not(.active) {
-    background-color: #657a8a;
-}
-
-a {
     color: white;
+    font-size: 1.5em;
+    height: inherit;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.navbar a {
+    float: left;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
     text-decoration: none;
 }
 
-.active {
-    background-color: #DCDCDD;
-    color: #657a8a;
+.dropdown {
+    margin-right: 0%;
+    float: right;
+    overflow: hidden;
 }
 
-#logoutButton {
+
+/* Dropdown button */
+
+.dropdown .dropbtn {
+    font-size: 1em;
     width: 100%;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    border: 0;
-    font-family: 'Rubik', sans-serif;
-    font-weight: bolder;
-    font-size: 25px;
+    height: 2.5em;
+    min-width: 160px;
+    border: none;
+    outline: none;
     color: white;
-    background: black;
+    background-color: #303030;
+    font-family: inherit;
+    text-align: center;
 }
 
-#logoutForm {
-    width: 100%;
+
+/* Add a red background color to navbar links on hover */
+
+.navbar a:hover,
+.dropdown:hover .dropbtn {
+    background-color: red;
+}
+
+
+/* Dropdown content (hidden by default) */
+
+.dropdown-content {
+    display: none;
+    background-color: #000000;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+
+/* Links inside the dropdown */
+
+.dropdown-content a {
+    float: none;
+    color: rgb(255, 255, 255);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+
+/* Add a grey background color to dropdown links on hover */
+
+.dropdown-content a:hover {
+    background-color: rgb(136, 0, 0);
+}
+
+
+/* Show the dropdown menu on hover */
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+#carStatus {
+    margin-left: 1em;
+    margin-right: 1em;
     display: flex;
+    flex-wrap: wrap;
+    padding-left: 1em;
+    padding-right: 1em;
+    height: 100%;
 }
 
-#logoutButton:hover {
-    cursor: pointer;
-    background: rgb(34, 34, 34);
+#carStatus p {
+    color: white;
+    margin: auto;
+}
+
+.notActive {
+    background-color: rgb(136, 0, 0);
+}
+
+.active {
+    background-color: rgb(5, 136, 0);
 }

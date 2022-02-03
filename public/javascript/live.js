@@ -2,7 +2,7 @@
  * @desc global variable that sets the update frequency for all interval functions. (in milliseconds)
  * @type {number}
  */
-let interval = 10; // updating charts time in milliseconds
+let interval = 100; // updating charts time in milliseconds
 /**
  * @desc global variable where latest received message is saved.
  * @type {JSON}
@@ -26,83 +26,91 @@ let xAxisOptionArray = [10, 30, 60, 90, 120, 180];
  * Constructor function for object that will handle all communicating between server and client.
  */
 function ServerInterface() {
-    this.idArray = { "canID": [] },
-        this.interval = undefined,
-        this.latestMessage = undefined,
-        this.intervaltime = interval,
+    this.idArray = { "canID": [] };
+    this.interval = undefined;
+    this.latestMessage = undefined;
+    this.intervaltime = 2000;
+    this.webSocket = new WebSocket('ws://localhost:3000');
 
-        // Adds new canID to a array that is sent to server to ask the latest messages from the
-        // can ids that are in array. 
-        this.addNewId = function(canID) {
-            this.idArray["canID"].push({ can: canID })
-        },
+    // Adds new canID to a array that is sent to server to ask the latest messages from the
+    // can ids that are in array. 
+    this.addNewId = function(canID) {
+        this.idArray["canID"].push({ can: canID })
+    };
 
+    socket.addEventListener("message", (event) => {
+            let receivedMessage = JSON.parse(event.data);
+            if (receivedMessage.latestMessage) {
+
+                this.latestMessage = receivedMessage.latestMessage;
+            }
+        })
         // interval function that will be used in a interval to ask messages from server.
-        this.intervalFunction = () => {
-            let response = new Promise(resolve => {
-                try {
-                    fetch('/updateLive/?can=' + JSON.stringify(this.idArray["canID"]))
-                        .then(response => response.json())
-                        .then((data) => {
-                            resolve(data);
-                        })
-                } catch (error) {
-                    resolve({ null: null });
-                }
-            })
-
-            response.then(values => {
-                this.latestMessage = values;
-            })
-        },
-
-        // Deletes can ID from the canID array. 
-        this.deleteCan = (canID) => {
-            for (let i = 0; i < this.idArray["canID"].length; i++) {
-                if (this.idArray["canID"][i].can === canID) {
-                    this.idArray["canID"].splice(i, 1);
-                }
-            }
-
-            if (this.idArray["canID"].length === 0) {
-                clearInterval(this.interval);
-                this.interval = undefined;
-            }
-        },
-
-        // returns the latest message with correspoding can ID
-        this.getLatestMessages = (canID) => {
+    this.intervalFunction = () => {
+        /*let response = new Promise(resolve => {
             try {
-                for (let i = 0; i < this.latestMessage.data.length; i++) {
-                    if (this.latestMessage.data[i][0].canID === canID) {
-                        return this.latestMessage.data[i][0];
-                    }
-                }
-
-                console.warn("can't find data with ID:", canID);
-                return {
-                    "ID": undefined,
-                    "canID": canID,
-                    "data": "0",
-                    "timestamp": undefined,
-                    "DLC": undefined
-                }
-
+                fetch('/updateLive/?can=' + JSON.stringify(this.idArray["canID"]))
+                    .then(response => response.json())
+                    .then((data) => {
+                        console.log(data);
+                        resolve(data);
+                    })
             } catch (error) {
-                console.warn(error);
-                return {
-                    "ID": undefined,
-                    "canID": canID,
-                    "data": "0",
-                    "timestamp": undefined,
-                    "DLC": undefined
+                resolve({ null: null });
+            }
+        })
+
+        response.then(values => {
+            this.latestMessage = values;
+        })*/
+    };
+
+    // Deletes can ID from the canID array. 
+    this.deleteCan = (canID) => {
+        for (let i = 0; i < this.idArray["canID"].length; i++) {
+            if (this.idArray["canID"][i].can === canID) {
+                this.idArray["canID"].splice(i, 1);
+            }
+        }
+
+        if (this.idArray["canID"].length === 0) {
+            clearInterval(this.interval);
+            this.interval = undefined;
+        }
+    };
+
+    // returns the latest message with correspoding can ID
+    this.getLatestMessages = (canID) => {
+        try {
+            for (let i in this.latestMessage) {
+                if (this.latestMessage[i][0].canID == canID) {
+                    return this.latestMessage[i][0];
                 }
             }
-        },
+            console.warn("can't find data with ID:", canID);
+            return {
+                "ID": undefined,
+                "canID": canID,
+                "data": "0",
+                "timestamp": undefined,
+                "DLC": undefined
+            }
 
-        this.getIdArray = function() {
-            return this.idArray;
+        } catch (error) {
+            console.warn(error);
+            return {
+                "ID": undefined,
+                "canID": canID,
+                "data": "0",
+                "timestamp": undefined,
+                "DLC": undefined
+            }
         }
+    };
+
+    this.getIdArray = function() {
+        return this.idArray;
+    };
 }
 
 const serverInterface = new ServerInterface();
@@ -194,20 +202,25 @@ function addChart() {
 
         for (let i = 0; i < labelAmount; i++) {
             let seconds = i / oneSec;
-            if ((seconds % 1) === 0) {
-                chart.data.labels.push(seconds);
+
+            if (labelAmount < 800) {
+                if ((seconds % 1) === 0) {
+                    chart.data.labels.push(seconds);
+                } else {
+                    chart.data.labels.push("");
+                }
             } else {
-                chart.data.labels.push("");
+                if ((seconds % 10) === 0) {
+                    chart.data.labels.push(seconds);
+                } else {
+                    chart.data.labels.push("");
+                }
             }
         }
 
         // Starting an interval that will update the chart with new data.
-        let tries = 0;
         let chartUpdateInterval = setInterval(() => {
             let latestMessage = serverInterface.getLatestMessages(selectedCAN);
-            tries++;
-            if (latestMessage.id === undefined && tries < 10) return;
-
             try {
                 updateChart(latestMessage, chart, ticks, labelAmount, oneSec);
             } catch (error) {
@@ -240,10 +253,6 @@ function createChartElements(selectedCAN) {
     const chartContainer = document.createElement("div");
     chartContainer.setAttribute("class", "chart");
 
-    const chartHeader = document.createElement("h3");
-    chartHeader.innerHTML = selectedName;
-
-    chartContainer.appendChild(chartHeader);
     // Creating canvas where the chart will appear
     const canvas = document.createElement("canvas");
     canvas.setAttribute("id", selectedCAN);
@@ -394,10 +403,18 @@ function updateChart(latestMessage, chart, ticks, startTime, oneSec) {
     chart.data.datasets[0].label = latestMessage.name;
 
     if (ticks >= startTime) {
-        if ((label % 1 === 0)) {
-            chart.data.labels.push(label);
+        if (startTime < 800) {
+            if ((label % 1 === 0)) {
+                chart.data.labels.push(label);
+            } else {
+                chart.data.labels.push("");
+            }
         } else {
-            chart.data.labels.push("");
+            if ((label % 10 === 0)) {
+                chart.data.labels.push(label);
+            } else {
+                chart.data.labels.push("");
+            }
         }
         chart.data.labels.shift();
     }

@@ -42,7 +42,7 @@ html {
 .chart {
     position: relative;
     width: 90%;
-    height: auto;
+    height: 400px!important;
     margin: 0;
     text-align: center;
 }
