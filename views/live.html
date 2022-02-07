@@ -33,10 +33,11 @@
     <main>
         <div id="addNewChart">
             <div class="optionsDiv" id="addNewChartOptions">
-                <div class="labelDiv">
-                    <label for="canDropDown" class="optionLabel">Select CAN:</label>
-                </div>
-                <select name="can" id="canDropDown">
+                <label for="canDropDown" class="optionLabel">Select CAN:</label>
+                <select name="can" id="canDropDown" class="dropDown">
+                </select>
+                <label for="xAxis" class="optionLabel">Select X-axis time:</label>
+                <select name="xAxis" id="xAxis" class="dropDown">
                 </select>
                 <input type="button" id="selectCANBtn" value="Create" onclick="addChart()">
                 </select>

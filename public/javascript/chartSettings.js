@@ -9,6 +9,7 @@ function ChartSettings() {
         datasets: []
     };
 
+
     this.options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -21,9 +22,15 @@ function ChartSettings() {
         },
         scales: {
             y: {
-                min: 0,
-                max: 15,
+                ticks: {
+                    autoSkip: true
+                },
+
+                type: 'linear',
+                display: true,
+                position: 'left',
                 stacked: true,
+
                 grid: {
                     display: true,
                     color: "rgba(255,99,132,0.2)"

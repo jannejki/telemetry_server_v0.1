@@ -4,7 +4,7 @@ html {
 
 #addNewChart {
     background-color: white;
-    width: auto;
+    width: 20%;
     min-width: 100px;
     display: flex;
     flex-wrap: wrap;
@@ -19,36 +19,28 @@ html {
     margin-right: 0;
 }
 
-#selectCANBtn {
-    margin: 1em auto;
-    width: 75%;
-}
-
-#canDropDown {
-    width: 100%;
-    margin: 1em auto;
-}
-
 .chartDiv {
     width: auto;
     height: auto;
     display: flex;
+    flex-wrap: wrap;
     margin: 1em;
     background-color: white;
     border-radius: 5px;
     box-shadow: 5px 5px 5px 5px #46484A;
+    text-align: center;
 }
 
 .chart {
     position: relative;
-    width: 90%;
+    width: 100%;
     height: 400px!important;
     margin: 0;
     text-align: center;
 }
 
 .optionsDiv {
-    width: 10%;
+    width: 100%;
     min-width: 80px;
     display: flex;
     flex-wrap: wrap;
@@ -66,11 +58,22 @@ html {
 }
 
 .optionLabel {
-    margin: auto;
+    margin: 0.5em auto;
+    width: 100%;
 }
 
 .timeDropDown {
     margin: auto;
+}
+
+.dropDown {
+    width: 75%;
+    margin: 0.5em auto;
+}
+
+#selectCANBtn {
+    width: 75%;
+    margin: 0.5em auto;
 }
 
 .selectTimeButton {
@@ -91,13 +94,6 @@ html {
     height: 100%;
 }
 
-.infoDiv {
-    width: 100%;
-    height: 10%;
-    display: flex;
-    flex-wrap: wrap;
-}
-
 .numberValues {
     margin: auto;
     border-style: none;
@@ -106,4 +102,13 @@ html {
 
 .numberValuesLabel {
     margin: auto;
+}
+
+.chartHeader {
+    width: 100%;
+    margin: 0.25em;
+}
+
+.chartHeader h2 {
+    margin: 0 auto;
 }

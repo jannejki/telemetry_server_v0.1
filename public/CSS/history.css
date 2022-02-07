@@ -20,9 +20,9 @@ html {
 }
 
 .chartDiv {
-    width: auto;
     height: auto;
     display: flex;
+    flex-wrap: wrap;
     margin: 1em;
     background-color: white;
     border-radius: 5px;
@@ -30,11 +30,8 @@ html {
 }
 
 .chart {
-    position: relative;
-    width: 90%;
-    height: 900px!important;
-    margin: 0;
-    text-align: center;
+    width: 100%;
+    height: 600px;
 }
 
 .optionsDiv {
@@ -115,4 +112,48 @@ html {
 
 .numberValuesLabel {
     margin: auto;
+}
+
+.rangeInput {
+    width: 100%;
+    position: relative;
+    background-color: rgb(181 181 181);
+    margin: 0;
+    height: 25px;
+}
+
+.range {
+    -webkit-appearance: none;
+    height: 25px;
+    width: 100%;
+    margin: 0;
+    background: #d3d3d3;
+    position: absolute;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    visibility: hidden;
+}
+
+.range:hover {
+    opacity: 1;
+}
+
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    visibility: visible!important;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+}
+
+.range::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+    visibility: visible!important;
 }

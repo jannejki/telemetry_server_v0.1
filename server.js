@@ -262,7 +262,6 @@ app.get("/getHistory", async(req, res) => {
     let canID = req.query.can;
     let query = "select * from data where timestamp BETWEEN'" + req.query.startTime + "' AND '" + req.query.endTime + "' AND canID='" + canID + "';"
     let calculatedValues = [];
-
     try {
         let getData = await db.raw(query);
 
@@ -312,8 +311,8 @@ function sendLiveData(rawData) {
 //------------------------------------------------//
 //------------------MQTT--------------------------//
 // create MQTT OBJECT
-//const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
-const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "asd" });
+const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
+//const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "asd" });
 
 // connecting to mqtt broker
 client.on("connect", function() {
@@ -328,7 +327,6 @@ client.on('message', async function(topic, message, packet) {
     try {
         let rawData = parseData(message.toString());
         sendLiveData(rawData);
-        // saveData(message.toString());
         saveData(rawData);
     } catch (error) {
         console.log("message is corrupted!");
