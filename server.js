@@ -281,13 +281,21 @@ app.get("/getHistory", async(req, res) => {
     } catch {
         res.sendStatus(500);
     }
+})
 
+app.get("/getNodes", async(req, res) => {
+    // let nodes = await db.select().table("nodes");
+    let nodes = { testi: "abc" }
+    res.send({ nodes: nodes }).status(204);
 })
 
 //------------------------------------------------//
 //----------------Web Socket----------------------//
 const wss = new WebSocket.Server({ server: server });
 
+/**
+ * @brief when new websocket client is connected, send car status back immediately.
+ */
 wss.on('connection', async function connection(ws) {
     console.log('A new Websocket- client Connected!');
     let isCarOnline = await checkIfCarIsOnline();
@@ -295,6 +303,10 @@ wss.on('connection', async function connection(ws) {
     ws.send(sendMessage);
 });
 
+/**
+ * @brief sends calculated data array to every websocket client
+ * @param {{ canID: string, data: hexadecimal, DLC: string, timestamp: string}} rawData data in hexadecimal form.
+ */
 function sendLiveData(rawData) {
     let dataArray = [];
     for (let i in rawData) {

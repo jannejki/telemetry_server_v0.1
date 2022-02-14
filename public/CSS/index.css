@@ -1,3 +1,49 @@
 html {
-    background-color:#585b5d;
+    background-color: #585b5d;
+}
+
+#dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    margin: auto;
+}
+
+.card {
+    width: 15%;
+    height: auto;
+    min-height: 150px;
+    margin: 0.5em;
+    background: rgb(140, 140, 140);
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 10px 10px 5px #0a0a0a;
+    overflow-wrap: break-word;
+}
+
+.running {
+    background-color: rgb(0, 199, 0);
+}
+
+.fault {
+    background-color: red;
+}
+
+.notResponding {
+    background: rgb(140, 140, 140);
+}
+
+.card h2 {
+    font-size: 1em!important;
+}
+
+.messageDiv h4 {
+    margin: 0;
+}
+
+.messageDiv p {
+    margin: 0;
+}
+
+.messageDiv {
+    margin: 1em;
 }

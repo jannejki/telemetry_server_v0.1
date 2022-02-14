@@ -166,9 +166,8 @@ function createChart(data) {
         }
         chartData.datasets.push(dataset);
     }
-
     for (let i = 0; i < data.length; i++) {
-        chartData.labels.push(data[i][2].time.slice(data[i][2].time.indexOf(" ")))
+        chartData.labels.push(data[i][0].time.slice(data[i][0].time.indexOf(" ")))
     }
     chartOptions.lineTension = 0;
     chartOptions.elements.point.radius = 3;
@@ -208,9 +207,7 @@ function sliderFunction(canID, data) {
                 chartList[i].data.datasets[j].data = valueArray;
                 chartList[i].data.labels = labelArray;
             }
-
             chartList[i].update();
-            console.log(chartList[i].data)
         }
     }
 }

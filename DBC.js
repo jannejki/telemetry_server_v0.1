@@ -25,7 +25,6 @@ exports.DbcParser = function() {
     this.getCanNames = () => {
         let decodingRules = this.dbcFile.split("\nBO_ ");
         decodingRules.splice(0, 1);
-
         for (let i = 0; i < decodingRules.length; i++) {
             if (decodingRules[i].indexOf("\nCM_ ") !== -1) {
                 let split = decodingRules[i].split("\nCM_ ");
@@ -41,7 +40,6 @@ exports.DbcParser = function() {
         for (let i = 0; i < decodingRules.length; i++) {
             let split = decodingRules[i].split(" ");
             let name = split[1].slice(0, -1);
-
             names.push({ canID: split[0], name: name });
         }
         return names;

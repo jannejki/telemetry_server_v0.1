@@ -33,7 +33,7 @@ function ChartSettings() {
 
                 grid: {
                     display: true,
-                    color: "rgba(255,99,132,0.2)"
+                    color: "#a8a8a8"
                 }
             },
             x: {

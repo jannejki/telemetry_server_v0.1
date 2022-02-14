@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Mohave:wght@700&family=Montserrat:wght@100&family=Rubik&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
 html {
     font-family: 'Montserrat', sans-serif;
     color: black!important;
@@ -37,6 +37,7 @@ body {
     font-family: 'Rubik', sans-serif;
     height: 2.5em;
     width: 100%;
+    min-width: 820px;
     position: fixed;
     left: 0;
     top: 0;
@@ -135,8 +136,6 @@ body {
 }
 
 #carStatus {
-    margin-left: 1em;
-    margin-right: 1em;
     display: flex;
     flex-wrap: wrap;
     padding-left: 1em;

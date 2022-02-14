@@ -5,8 +5,8 @@ let timeout;
 let carStatus = document.getElementById("carStatus");
 
 // Create WebSocket connection.
-//const socket = new WebSocket('ws://152.70.178.116:3000');
-const socket = new WebSocket('ws://localhost:3000');
+const socket = new WebSocket('ws://152.70.178.116:3000');
+//const socket = new WebSocket('ws://localhost:3000');
 
 // Connection opened
 socket.addEventListener('open', function(event) {

@@ -30,7 +30,7 @@ function ServerInterface() {
     this.interval = undefined;
     this.latestMessage = undefined;
     this.intervaltime = 2000;
-    this.webSocket = new WebSocket('ws://localhost:3000');
+    this.webSocket = new WebSocket('ws://152.70.178.116:3000');
 
     // Adds new canID to a array that is sent to server to ask the latest messages from the
     // can ids that are in array. 
@@ -174,6 +174,7 @@ function addChart() {
         if (chart.data.datasets.length === 0) {
             latestMessage.forEach((data) => {
                 let randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+
                 let dataset = {
                     spanGaps: true,
                     label: data.name + " (" + data.unit + ")",
