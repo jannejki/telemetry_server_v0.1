@@ -5,8 +5,8 @@ let timeout;
 let carStatus = document.getElementById("carStatus");
 
 // Create WebSocket connection.
-const socket = new WebSocket('ws://152.70.178.116:3000');
-//const socket = new WebSocket('ws://localhost:3000');
+//const socket = new WebSocket('ws://152.70.178.116:3000');
+const socket = new WebSocket('ws://localhost:3000');
 
 // Connection opened
 socket.addEventListener('open', function(event) {
@@ -20,6 +20,10 @@ socket.addEventListener('open', function(event) {
  */
 socket.addEventListener('message', function(event) {
     let message = JSON.parse(event.data);
+
+    if (document.getElementById("debug").checked && message.debug) {
+        console.log(message);
+    }
 
     // Checks if there is carStatus -value in message and it is true
     if (message.carStatus) {
@@ -38,6 +42,10 @@ socket.addEventListener('message', function(event) {
     } else {
         // if there is no carStatus value or it is false, change element class and text
         carNotActive();
+    }
+
+    if (message.error) {
+        console.log(message.errorMessage);
     }
 });
 

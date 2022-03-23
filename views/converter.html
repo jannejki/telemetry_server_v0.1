@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Telemetry</title>
     <link href="/CSS/navBar.css" rel="stylesheet">
-    <link href="/CSS/index.css" rel="stylesheet">
+    <link href="/CSS/converter.css" rel="stylesheet">
 </head>
 
 <body>
@@ -38,12 +38,29 @@
         </div>
     </div>
     <main>
-        <div id="dashboard">
+        <form id="convertForm">
+            <div>
+                <label for="nodes">CAN node:</label><br>
+                <select name="can" id="canList" class="input">
+            </select>
+            </div>
+            <div>
+                <label for="hexInput">Hex string:</label><br>
+                <input type="text" name="hex" id="hexInput" class="input" required>
+            </div>
+            <input type="submit" class="input">
+        </form>
 
-        </div>
+        <table id="valueTable">
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Unit</th>
+            </tr>
+        </table>
     </main>
     <script src="javascript/navBar.js"></script>
-    <script src="javascript/index.js"></script>
+    <script src="javascript/converter.js"></script>
 </body>
 
 </html>

@@ -13,6 +13,13 @@
     <div id="navbar">
         <img id="logo" src="images/logo.svg" />
         <h1>Telemetry server</h1>
+        <div id="debugSwitch">
+            <label class="label">Debug</label>
+            <label class="switch">
+            <input type="checkbox" id="debug">
+            <span class="slider round"></span>
+          </label>
+        </div>
         <div id="carStatus" class="">
             <p></p>
         </div>
@@ -24,6 +31,7 @@
                 <a href="/">Dashboard</a>
                 <a href="live">Live</a>
                 <a href="history">History</a>
+                <a href="converter">Converter</a>
                 <a href="settings">Settings</a>
                 <a href="logout?_method=DELETE">Log out</a>
             </div>

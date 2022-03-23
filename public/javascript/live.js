@@ -31,6 +31,7 @@ function ServerInterface() {
     this.latestMessage = undefined;
     this.intervaltime = 2000;
     this.webSocket = new WebSocket('ws://152.70.178.116:3000');
+    //this.webSocket = new WebSocket('ws://127.0.0.1:3000');
 
     // Adds new canID to a array that is sent to server to ask the latest messages from the
     // can ids that are in array. 

@@ -203,6 +203,10 @@ exports.DbcParser = function() {
         const rules = this.getDecodingRules(message.canID);
         let valueArray = [];
 
+        if (rules.error) {
+            return rules;
+        }
+
         // for each signal rule, calculate value
         rules.forEach(rule => {
             let startBit = parseInt(rule.startBit);
@@ -211,7 +215,6 @@ exports.DbcParser = function() {
             // extract wanted bits from the message
             let binaryMessage = this.hexToBin(message.data)
             binaryMessage = binaryMessage.slice(startBit, (startBit + length));
-
             // create byte array 
             let binaryArray = binaryMessage.split("");
             let byteArray = [];
@@ -252,7 +255,6 @@ exports.DbcParser = function() {
             // push calculated value to array
             valueArray.push({ canID: message.canID, name: rule.name, data: value, unit: rule.unit, min: rule.min, max: rule.max, time: message.timestamp })
         })
-
         return valueArray;
     }
 
@@ -347,6 +349,69 @@ exports.DbcParser = function() {
             // if something went wrong, return this
             return { error: error, value: undefined }
         }
+    }
 
+    this.parseMessage = (message) => {
+        byteArray = [];
+        messageArray = [];
+        const timestamp = this.getTime();
+
+        for (let i = 0; i < message.length; i += 2) {
+            byteArray.push([message[i], message[i + 1]]);
+        }
+
+        try {
+            while (byteArray.length > 0) {
+                let canID = (byteArray[0].concat(byteArray[1])).join("");
+                canID = this.hexToBin(canID);
+                canID = this.binToDec(canID);
+
+                let dlc = byteArray[2].join("");
+                dlc = this.hexToBin(dlc);
+                dlc = this.binToDec(dlc);
+
+                byteArray.splice(0, 3);
+
+                let data = "";
+                for (let i = 0; i < dlc; i++) {
+                    data += byteArray[0].join("").toUpperCase();;
+                    byteArray.splice(0, 1);
+                }
+
+                messageArray.push({ canID: canID.toString(), DLC: dlc, data: data, timestamp: timestamp });
+            }
+            return messageArray;
+        } catch (error) {
+            console.log(error);
+            return ({ error: error })
+        }
+    }
+
+    this.getTime = () => {
+        const today = new Date();
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let day = today.getDate();
+        let hr = today.getHours();
+        let min = today.getMinutes();
+        let sec = today.getSeconds();
+        let ms = today.getMilliseconds();
+
+        month = this.checkTime(month);
+        day = this.checkTime(day);
+        hr = this.checkTime(hr);
+        min = this.checkTime(min);
+        sec = this.checkTime(sec);
+        ms = this.checkTime(ms);
+
+        let timestamp = year + "-" + month + "-" + day + " " + hr + ":" + min + ":" + sec + "." + ms;
+        return timestamp;
+    }
+
+    this.checkTime = (i) => {
+        if (i < 10) {
+            i = "0" + i
+        };
+        return i;
     }
 }

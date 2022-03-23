@@ -13,9 +13,10 @@ window.onload = () => {
     month = checkTime(month);
     hr = checkTime(hr);
     min = checkTime(min);
+    let startHr = checkTime(hr - 1);
 
     document.getElementById("date").value = year + "-" + month + "-" + day;
-    document.getElementById("hourStart").value = hr - 1 + ":" + min;
+    document.getElementById("hourStart").value = startHr + ":" + min;
     document.getElementById("hourEnd").value = hr + ":" + min;
 
     // load CAN names and IDs from server to fill dropdown -list

@@ -146,7 +146,13 @@ app.get('/history', checkAuthenticated, async(req, res) => {
  */
 app.get('/settings', checkAuthenticated, async(req, res) => {
     res.sendFile(path.join(__dirname, '/views/settings.html'));
+})
 
+/**
+ * @brief sends converterpage to user 
+ */
+app.get('/converter', checkAuthenticated, async(req, res) => {
+    res.sendFile(path.join(__dirname, '/views/converter.html'));
 })
 
 /**
@@ -212,7 +218,6 @@ app.get("/loadDbcFiles", async(req, res) => {
  */
 app.delete("/deleteFile", (req, res) => {
     const path = './database/dbcFiles/' + req.body.filename;
-
     try {
         fs.unlinkSync(path)
         res.sendStatus(204);
@@ -283,10 +288,14 @@ app.get("/getHistory", async(req, res) => {
     }
 })
 
-app.get("/getNodes", async(req, res) => {
-    // let nodes = await db.select().table("nodes");
-    let nodes = { testi: "abc" }
-    res.send({ nodes: nodes }).status(204);
+/**
+ * @brief gets canID and hex string as query parameters, calculates real values
+ * and returns it.
+ */
+app.get("/calculateValue", (req, res) => {
+    console.log(req.query);
+    let values = dbcParser.calculateValue(req.query);
+    res.send({ value: values }).status(204);
 })
 
 //------------------------------------------------//
@@ -310,7 +319,9 @@ wss.on('connection', async function connection(ws) {
 function sendLiveData(rawData) {
     let dataArray = [];
     for (let i in rawData) {
-        dataArray.push(dbcParser.calculateValue(rawData[i]));
+        let calculatedValue = dbcParser.calculateValue(rawData[i]);
+        if (calculatedValue.error) throw calculatedValue;
+        dataArray.push(calculatedValue);
     }
 
     wss.clients.forEach(function each(client) {
@@ -319,12 +330,18 @@ function sendLiveData(rawData) {
     });
 }
 
+function sendDebugMessage(rawMessage) {
+    wss.clients.forEach(function each(client) {
+        let message = JSON.stringify({ debug: { message: rawMessage }, carStatus: true })
+        client.send(message);
+    });
+}
 
 //------------------------------------------------//
 //------------------MQTT--------------------------//
 // create MQTT OBJECT
-const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
-//const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "asd" });
+//const client = mqtt.connect("mqtt:localhost:1883", { clientId: "telemetry_server" });
+const client = mqtt.connect("mqtt:152.70.178.116:1883", { clientId: "laasdtop" });
 
 // connecting to mqtt broker
 client.on("connect", function() {
@@ -337,12 +354,13 @@ client.subscribe("messages");
 // receive MQTT messages
 client.on('message', async function(topic, message, packet) {
     try {
-        let rawData = parseData(message.toString());
+        const rawData = dbcParser.parseMessage(message.toString('hex'));
         sendLiveData(rawData);
         saveData(rawData);
+        sendDebugMessage({ error: null, received: message.toString('hex') });
     } catch (error) {
         console.log("message is corrupted!");
-        console.log(error);
+        sendDebugMessage({ error: error, received: message.toString('hex') });
     }
 });
 
@@ -383,7 +401,7 @@ async function saveData(data) {
             });
         } catch (error) {
             console.log("Can't save data!");
-            console.log(error);
+            // console.log(error);
         }
     }
 }
@@ -440,33 +458,6 @@ function checkTime(i) {
         i = "0" + i
     };
     return i;
-}
-
-/**
- * @brief parses raw data to a json format.
- * @param {text} rawData raw data that was received from car
- * @returns {{canID:text, data:text, DLC:text, timestamp:text}}
- */
-function parseData(rawData) {
-    let timestamp = getTime();
-    let dataArray = rawData.split(":");
-    let parsedArray = [];
-
-    while (dataArray.length > 0) {
-        try {
-            parsedArray.push({
-                canID: dataArray[0],
-                data: dataArray[2],
-                DLC: dataArray[1],
-                timestamp: timestamp
-            });
-            dataArray.splice(0, 3);
-        } catch (error) {
-            console.log("can't parse data: ", error, dataArray[0]);
-            return;
-        }
-    }
-    return parsedArray;
 }
 
 /**

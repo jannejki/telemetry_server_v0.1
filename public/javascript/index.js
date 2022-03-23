@@ -47,7 +47,8 @@ function getNodes() {
     })
 }
 
-const cardSocket = new WebSocket('ws://152.70.178.116:3000');
+const cardSocket = new WebSocket('ws://127.0.0.1:3000');
+//const cardSocket = new WebSocket('ws://152.70.178.116:3000');
 
 /**
  * @brief event listener starts updating cards
