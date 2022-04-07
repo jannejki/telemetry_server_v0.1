@@ -60,8 +60,8 @@ BO_ 8 Opmode_BMS: 8 BMS
  SG_ Air_Flag : 63|8@0+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 9 Pec_Error_BMS: 8 BMS
- SG_ Pec_Total : 7|32@0+ (1,0) [0|0] "" Vector__XXX
- SG_ Pec_Delta : 39|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Pec_Total : 7|32@0+ (0.0001,0) [0|0] "" Vector__XXX
+ SG_ Pec_Delta : 39|32@0+ (0.0001,0) [0|0] "" Vector__XXX
 
 BO_ 10 Data_BMS: 8 BMS
  SG_ Accumulator_Voltage : 7|32@0+ (1,0) [0|0] "" Vector__XXX
@@ -85,7 +85,7 @@ BO_ 1680 Node_Analog_9_Data: 4 Analog_Node_9
  SG_ Oil_Temperature_Front_Left : 23|8@0+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 1681 Node_Analog_9_Diag: 8 Analog_Node_9
- SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
 
 BO_ 1683 Node_Analog_10_Diag: 8 Analog_Node_10
@@ -93,17 +93,17 @@ BO_ 1683 Node_Analog_10_Diag: 8 Analog_Node_10
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
 
 BO_ 1682 Node_Analog_10_Data: 6 Analog_Node_10
- SG_ Water_Temperature_Front_Right : 31|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Water_Temperature_Front_Right : 31|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
  SG_ Suspension_Front_Left : 7|16@0+ (1,0) [0|0] "" Vector__XXX
  SG_ Suspension_Front_Right : 39|16@0+ (1,0) [0|0] "" Vector__XXX
- SG_ Oil_Temperature_Front_Right : 23|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Oil_Temperature_Front_Right : 23|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1685 Node_Analog_11_Diag: 8 Analog_Node_11
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
  SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "" Vector__XXX
 
 BO_ 1684 Node_Analog_11_Data: 8 Analog_Node_11
- SG_ Brake_Temperature_Front_Left : 55|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Brake_Temperature_Front_Left : 55|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
  SG_ Brake_Pressure_Front : 39|16@0- (0.1,0) [0|0] "bar" Vector__XXX
  SG_ Brake_Pressure_Back : 23|16@0- (0.1,0) [0|0] "bar" Vector__XXX
  SG_ APPS1 : 7|16@0+ (1,0) [0|0] "" Vector__XXX
@@ -113,13 +113,13 @@ BO_ 1687 Node_Analog_12_Diag: 8 Analog_Node_12
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "" Vector__XXX
 
 BO_ 1686 Node_Analog_12_Data: 4 Analog_Node_12
- SG_ Water_Temperature_Left_Before : 7|8@0+ (1,0) [0|0] "°C" Vector__XXX
- SG_ Water_Temperature_Left_After : 15|8@0+ (1,0) [0|0] "°C" Vector__XXX
- SG_ Water_Temperature_Right_After : 31|8@0+ (1,0) [0|0] "°C" Vector__XXX
- SG_ Water_Temperature_Right_Before : 23|8@0+ (1,0) [0|0] "°C" Vector__XXX
+ SG_ Water_Temperature_Left_Before : 7|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Water_Temperature_Left_After : 15|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Water_Temperature_Right_After : 31|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Water_Temperature_Right_Before : 23|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1689 Node_Analog_13_Diag: 8 Analog_Node_13
- SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
 
 BO_ 1688 Node_Analog_13_Data: 4 Analog_Node_13
@@ -127,17 +127,17 @@ BO_ 1688 Node_Analog_13_Data: 4 Analog_Node_13
  SG_ Suspension_Back_Right : 23|16@0+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 1691 Node_Analog_14_Diag: 8 Analog_Node_14
- SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
 
 BO_ 1690 Node_Analog_14_Data: 6 Analog_Node_14
- SG_ Oil_Tempearture_Back_Left : 47|8@0+ (1,0) [0|0] "°C" Vector__XXX
- SG_ Oil_Temperature_Back_Right : 39|8@0+ (1,0) [0|0] "°C" Vector__XXX
- SG_ Brake_Temperature_Back_Left : 23|16@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Brake_Temperature_Back_Right : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Oil_Tempearture_Back_Left : 47|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Oil_Temperature_Back_Right : 39|8@0+ (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Brake_Temperature_Back_Left : 23|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Brake_Temperature_Back_Right : 7|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1693 Node_Analog_15_Diag: 8 Analog_Node_15
- SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Internal_Temperature : 7|16@0- (1,0) [0|0] "ï¿½C" Vector__XXX
  SG_ Driver_Current : 23|16@0+ (0.001,0) [0|0] "A" Vector__XXX
 
 BO_ 1695 Node_Analog_16_Diag: 8 Analog_Node_16
@@ -149,24 +149,24 @@ BO_ 1697 Node_Analog_17_Diag: 8 Analog_Node_17
 BO_ 1699 Node_Analog_18_Diag: 8 Analog_Node_18
 
 BO_ 1692 Node_Analog_15_Data: 3 Analog_Node_15
- SG_ Tire_Temperature_Front_Left_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Front_Left_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Front_Left_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Front_Left_Inside : 7|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Front_Left_Middle : 15|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Front_Left_Outside : 23|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1694 Node_Analog_16_Data: 3 Analog_Node_16
- SG_ Tire_Temperature_Front_Right_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Front_Right_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Front_Right_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Front_Right_Inside : 7|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Front_Right_Middle : 15|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Front_Right_Outside : 23|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1696 Node_Analog_17_Data: 3 Analog_Node_17
- SG_ Tire_Temperature_Rear_Left_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Rear_Left_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperatuer_Rear_Left_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Left_Inside : 7|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Left_Middle : 15|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperatuer_Rear_Left_Outside : 23|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1698 Node_Analog_18_Data: 3 Analog_Node_18
- SG_ Tire_Temperature_Rear_Right_Inside : 7|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Rear_Right_Middle : 15|8@0- (1,0) [0|0] "°C" Vector__XXX
- SG_ Tire_Temperature_Rear_Right_Outside : 23|8@0- (1,0) [0|0] "°C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Right_Inside : 7|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Right_Middle : 15|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
+ SG_ Tire_Temperature_Rear_Right_Outside : 23|8@0- (1,0) [0|0] "ï¿½C" Vector__XXX
 
 BO_ 1710 Node_Power_33_Info: 3 Power_Node_33
  SG_ Digital_In : 7|8@0+ (1,0) [0|0] "" Vector__XXX
@@ -222,20 +222,20 @@ CM_ BO_ 1971 "nothing between the BMS spam, it is for all voltages and temperatu
 CM_ BO_ 1536 "error message from a can node";
 CM_ BO_ 1538 "used to configure can nodes";
 CM_ BO_ 1537 "can node response to configuration message";
-CM_ SG_ 1680 Water_Temperature_Front_Left "°C";
-CM_ SG_ 1680 Brake_Temperature_Front_Left "°C";
-CM_ SG_ 1680 Oil_Temperature_Front_Left "°C";
+CM_ SG_ 1680 Water_Temperature_Front_Left "ï¿½C";
+CM_ SG_ 1680 Brake_Temperature_Front_Left "ï¿½C";
+CM_ SG_ 1680 Oil_Temperature_Front_Left "ï¿½C";
 CM_ SG_ 1681 Internal_Temperature "";
 CM_ SG_ 1681 Driver_Current "";
 CM_ SG_ 1682 Suspension_Front_Left "need to set units and factor";
 CM_ SG_ 1682 Suspension_Front_Right "need to set units and factor";
 CM_ SG_ 1685 Driver_Current "A";
-CM_ SG_ 1685 Internal_Temperature "°C";
+CM_ SG_ 1685 Internal_Temperature "ï¿½C";
 CM_ SG_ 1684 Brake_Temperature_Front_Left "";
 CM_ SG_ 1684 Brake_Pressure_Front "need to check units and factor and length";
 CM_ SG_ 1684 Brake_Pressure_Back "need to check units and factor and length";
 CM_ BO_ 1687 "";
-CM_ SG_ 1687 Internal_Temperature "°C";
+CM_ SG_ 1687 Internal_Temperature "ï¿½C";
 CM_ SG_ 1687 Driver_Current "A";
 CM_ SG_ 1686 Water_Temperature_Left_Before "";
 CM_ SG_ 1686 Water_Temperature_Left_After "";

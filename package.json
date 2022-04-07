@@ -1,0 +1,29 @@
+{
+    "name": "telemetry_server_v0.1",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jannejki/telemetry_server_v0.1.git"
+    },
+    "author": "JKi",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/jannejki/telemetry_server_v0.1/issues"
+    },
+    "homepage": "https://github.com/jannejki/telemetry_server_v0.1#readme",
+    "dependencies": {
+        "bcrypt": "^5.0.1",
+        "body-parser": "^1.20.0",
+        "express-flash": "^0.0.2",
+        "express-session": "^1.17.2",
+        "mqtt": "^4.3.7",
+        "multer": "^1.4.4",
+        "passport": "^0.5.2"
+    }
+}

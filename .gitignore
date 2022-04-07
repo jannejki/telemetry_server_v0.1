@@ -1,6 +1,7 @@
 /database
-database/dbcFiles/CAN0.dbc
-database/dbcFiles/CAN0.dbc
+/database/dbcFiles
 database/dbcFiles/CAN1 (1).dbc
-database/dbcFiles/CAN0.dbc
 database/telemetry.db
+/ideas and notes
+database/telemetry.db
+node_modules
